@@ -5,7 +5,7 @@ import type { DateRange } from "react-day-picker";
 import { useVendas } from "@/hooks/use-vendas";
 import type { SalesReport } from "@/types/order";
 
-import { ReportAuthGuard } from "../../../../components/auth/report-auth-guard";
+import { AuthGuard } from "../../../../components/auth/auth-guard";
 import { SalesReportHeader } from "./_components/dashboard-header";
 import { SalesReportMetrics } from "./_components/dashboard-metrics";
 import { SalesReportTabs } from "./_components/dashboard-tabs";
@@ -172,7 +172,12 @@ export default function DashboardPage() {
   const totalItems = report.topProducts.reduce((acc, p) => acc + p.quantity, 0);
 
   return (
-    <ReportAuthGuard>
+    <AuthGuard 
+      title="Acesso aos Relatórios"
+      persistAuth={false}
+      showLoading={false}
+      minHeight="500px"
+    >
       <div className="bg-background container mx-auto space-y-4">
         <SalesReportHeader
           dateRange={dateRange}
@@ -188,6 +193,6 @@ export default function DashboardPage() {
         />
         <SalesReportTabs report={report} />
       </div>
-    </ReportAuthGuard>
+    </AuthGuard>
   );
 }

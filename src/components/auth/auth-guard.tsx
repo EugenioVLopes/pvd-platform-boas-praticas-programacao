@@ -1,50 +1,53 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PulseLoader } from "react-spinners";
+import { memo, type ReactNode } from "react";
 
-import { Auth } from "./auth-form";
+import { useAuthGuard } from "@/hooks/use-auth-guard";
 
-interface AuthGuardProps {
-  children: React.ReactNode;
+import { AuthContainer } from "./auth-container";
+import { AuthLoading } from "./auth-loading";
+
+export interface AuthGuardProps {
+  children: ReactNode;
+  title?: string;
+  persistAuth?: boolean;
+  showLoading?: boolean;
+  minHeight?: string;
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Aqui podemos verificar se existe um token no localStorage depois
-    const auth = localStorage.getItem("auth");
-    setIsAuthenticated(!!auth);
-    setIsLoading(false);
-  }, []);
+export const AuthGuard = memo(function AuthGuard({
+  children,
+  title = "Acesso Restrito",
+  persistAuth = true,
+  showLoading = true,
+  minHeight = "400px",
+}: AuthGuardProps) {
+  const { isAuthenticated, isLoading, error, login } = useAuthGuard({
+    persistAuth,
+    showLoading,
+  });
 
   if (isLoading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <PulseLoader
-          color="#ff04da"
-          margin={10}
-          size={45}
-          speedMultiplier={0.5}
-        />
-      </div>
+      <AuthLoading
+        minHeight={minHeight}
+        message="Verificando suas credenciais..."
+      />
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <Auth
-          onLogin={() => {
-            localStorage.setItem("auth", "true");
-            setIsAuthenticated(true);
-          }}
-        />
-      </div>
+      <AuthContainer
+        title={title}
+        minHeight={minHeight}
+        onLogin={login}
+        error={error}
+      />
     );
   }
 
   return <>{children}</>;
-}
+});
+
+AuthGuard.displayName = "AuthGuard";
