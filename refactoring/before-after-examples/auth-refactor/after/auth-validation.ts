@@ -38,19 +38,19 @@ export class AuthValidator {
     }
 
     // Simula delay de autenticação
-    await new Promise((resolve) => 
+    await new Promise((resolve) =>
       setTimeout(resolve, AUTH_CONFIG.VALIDATION_DELAY)
     );
 
     // Verificação de senha
     const isValid = this.verifyPassword(password);
-    
+
     if (isValid) {
       return { success: true };
     } else {
-      return { 
-        success: false, 
-        error: AUTH_CONFIG.ERROR_MESSAGES.INCORRECT_PASSWORD 
+      return {
+        success: false,
+        error: AUTH_CONFIG.ERROR_MESSAGES.INCORRECT_PASSWORD,
       };
     }
   }

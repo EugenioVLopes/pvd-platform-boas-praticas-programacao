@@ -1,9 +1,13 @@
-import { useMemo } from 'react'
-import { calculateSalesReport, type Venda, type SalesReport } from './sales-report-utils'
+import { useMemo } from "react";
+import {
+  calculateSalesReport,
+  type SalesReport,
+  type Venda,
+} from "./sales-report-utils";
 
 /**
  * ✅ SOLUÇÃO: Hook customizado para orquestração
- * 
+ *
  * Responsabilidades:
  * - Gerenciar o estado reativo dos dados
  * - Chamar as funções utilitárias quando necessário
@@ -17,10 +21,10 @@ export function useSalesReport(
 ): SalesReport {
   const relatorio = useMemo(() => {
     // ✅ BENEFÍCIO: Lógica de negócios isolada e testável
-    return calculateSalesReport(vendas, dataInicio, dataFim)
-  }, [vendas, dataInicio, dataFim])
+    return calculateSalesReport(vendas, dataInicio, dataFim);
+  }, [vendas, dataInicio, dataFim]);
 
-  return relatorio
+  return relatorio;
 }
 
 /**
@@ -32,8 +36,8 @@ export function useSalesMetrics(
   dataInicio: Date,
   dataFim: Date
 ) {
-  const { metricas } = useSalesReport(vendas, dataInicio, dataFim)
-  return metricas
+  const { metricas } = useSalesReport(vendas, dataInicio, dataFim);
+  return metricas;
 }
 
 /**
@@ -45,15 +49,12 @@ export function useSalesChartData(
   dataInicio: Date,
   dataFim: Date
 ) {
-  const { vendasPorCategoria, vendasPorMetodoPagamento, vendasPorHora } = useSalesReport(
-    vendas,
-    dataInicio,
-    dataFim
-  )
-  
+  const { vendasPorCategoria, vendasPorMetodoPagamento, vendasPorHora } =
+    useSalesReport(vendas, dataInicio, dataFim);
+
   return {
     vendasPorCategoria,
     vendasPorMetodoPagamento,
-    vendasPorHora
-  }
+    vendasPorHora,
+  };
 }

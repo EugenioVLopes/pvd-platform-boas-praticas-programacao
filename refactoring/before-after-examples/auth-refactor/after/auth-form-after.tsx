@@ -31,7 +31,7 @@ export const Auth = memo(function Auth({ onLogin }: AuthProps) {
       if (result.success) {
         onLogin();
       } else {
-        setError(result.error);
+        setError(result.error || "");
         setPassword("");
       }
 
