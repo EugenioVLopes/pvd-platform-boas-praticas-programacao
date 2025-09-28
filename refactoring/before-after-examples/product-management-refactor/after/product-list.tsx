@@ -48,9 +48,9 @@ function ProductCard({ product }: { product: Product }) {
         <CardTitle>{product.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p>Preço: {formatPrice(product.price, product.type)}</p>
+        {/* <p>Preço: {formatPrice(product.price, product.type)}</p>
         <p>Categoria: {product.category}</p>
-        <p>Tipo: {formatProductType(product.type)}</p>
+        <p>Tipo: {formatProductType(product.type)}</p> */}
       </CardContent>
     </Card>
   );
