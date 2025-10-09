@@ -145,17 +145,6 @@
 3. Centralizar lógica de cálculos
 4. Simplificar função de impressão
 
-## Instruções de Uso
-
-1. Para cada code smell identificado, crie uma nova seção numerada
-2. Preencha todos os campos obrigatórios:
-   - **Arquivo:** Caminho completo do arquivo
-   - **Linha:** Número da linha onde o problema foi identificado
-   - **Descrição:** Explicação detalhada do problema
-   - **Severidade:** Alta/Média/Baixa
-   - **Ferramenta:** Ferramenta ou método usado para identificar
-   - **Status:** Pendente/Em Progresso/Resolvido
-
 ## Critérios de Severidade
 
 - **Alta:** Impacto significativo na manutenibilidade, performance ou legibilidade
