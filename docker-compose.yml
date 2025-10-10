@@ -1,0 +1,13 @@
+services:
+  web:
+    container_name: pvd-platform
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pvd-platform:latest
+    environment:
+      NODE_ENV: production
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
