@@ -30,6 +30,7 @@ export function useAuthGuard({
       const storedAuth = localStorage.getItem(AUTH_STORAGE_KEY);
       return !!storedAuth;
     } catch (err) {
+      console.error("Erro ao acessar dados de autenticação:", err);
       setError("Erro ao acessar dados de autenticação");
       return false;
     }
@@ -43,6 +44,8 @@ export function useAuthGuard({
       setIsAuthenticated(true);
       setError(null);
     } catch (err) {
+      setIsAuthenticated(false);
+      console.error("Erro ao salvar dados de autenticação:", err);
       setError("Erro ao salvar dados de autenticação");
     }
   }, [persistAuth]);
@@ -55,6 +58,7 @@ export function useAuthGuard({
       setIsAuthenticated(false);
       setError(null);
     } catch (err) {
+      console.error("Erro ao remover dados de autenticação:", err);
       setError("Erro ao remover dados de autenticação");
     }
   }, [persistAuth]);
