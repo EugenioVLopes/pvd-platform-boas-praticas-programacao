@@ -2,7 +2,7 @@
 
 import { memo, type ReactNode } from "react";
 
-import { useAuthGuard } from "@/hooks/use-auth-guard";
+import { useAuthGuard } from "@/hooks/core/use-auth-guard";
 
 import { AuthContainer } from "./auth-container";
 import { AuthLoading } from "./auth-loading";
