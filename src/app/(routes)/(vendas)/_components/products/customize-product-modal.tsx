@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useProducts } from "@/hooks/use-products";
+import { useProducts } from "@/hooks/business/use-products";
 import { Product } from "@/types/product";
 
 interface CustomizeProductModalProps {
@@ -150,7 +150,7 @@ export function CustomizeProductModal({
                         >
                           <span>{option.name}</span>
                           {selectedOptions.frutas.includes(option.name) && (
-                            <Check className="text-primary h-4 w-4" />
+                            <Check className="h-4 w-4 text-primary" />
                           )}
                         </CommandItem>
                       ))}
@@ -189,7 +189,7 @@ export function CustomizeProductModal({
                         >
                           <span>{option.name}</span>
                           {selectedOptions.cremes.includes(option.name) && (
-                            <Check className="text-primary h-4 w-4" />
+                            <Check className="h-4 w-4 text-primary" />
                           )}
                         </CommandItem>
                       ))}
@@ -231,7 +231,7 @@ export function CustomizeProductModal({
                           <span>{option.name}</span>
                           {selectedOptions.acompanhamentos.includes(
                             option.name
-                          ) && <Check className="text-primary h-4 w-4" />}
+                          ) && <Check className="h-4 w-4 text-primary" />}
                         </CommandItem>
                       ))}
                     </CommandGroup>

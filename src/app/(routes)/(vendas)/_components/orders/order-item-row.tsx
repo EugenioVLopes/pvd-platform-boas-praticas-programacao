@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useProducts } from "@/hooks/use-products";
+import { useProducts } from "@/hooks/business/use-products";
 import { Product, SaleItem } from "@/types/product";
 
 interface OrderItemRowProps {
@@ -29,7 +29,7 @@ export function OrderItemRow({ item, onRemove, onUpdate }: OrderItemRowProps) {
 
   const adicionais = products.filter((p) => p.type === "addon");
   const acompanhamentos = products.filter(
-    (p) => p.category === "Acompanhamentos",
+    (p) => p.category === "Acompanhamentos"
   );
 
   // Calcula o subtotal baseada no tipo do produto (por peso ou unidade)
@@ -174,7 +174,7 @@ export function OrderItemRow({ item, onRemove, onUpdate }: OrderItemRowProps) {
                         setSelectedAddons((prev) =>
                           prev.some((a) => a.id === adicional.id)
                             ? prev.filter((a) => a.id !== adicional.id)
-                            : [...prev, adicional],
+                            : [...prev, adicional]
                         )
                       }
                     >
@@ -208,7 +208,7 @@ export function OrderItemRow({ item, onRemove, onUpdate }: OrderItemRowProps) {
                         setSelectedAddons((prev) =>
                           prev.some((a) => a.id === acomp.id)
                             ? prev.filter((a) => a.id !== acomp.id)
-                            : [...prev, { ...acomp, price: 2.0 }],
+                            : [...prev, { ...acomp, price: 2.0 }]
                         )
                       }
                     >

@@ -9,6 +9,7 @@ import { calculateItemTotal } from "@/lib/utils/calculations";
 import { CartSection } from "./cart/cart-section";
 import { SalesHeader } from "./header/sales-header";
 import { ActionSelectionModal } from "./modals/action-selection-modal";
+import { NewOrderModal } from "./modals/new-order-modal";
 import { PaymentMethodSelection } from "./modals/payment-method-selection";
 import { WeightInputModal } from "./modals/weight-input-modal";
 import { OrderSection } from "./orders/order-section";
@@ -18,8 +19,9 @@ import { ProductList } from "./products/product-list";
 
 export function SalesProcessing() {
   const {
-    state,
-    setState,
+    uiState,
+    uiActions,
+    currentOrder,
     products,
     temporaryItems,
     orders,
@@ -46,42 +48,29 @@ export function SalesProcessing() {
   return (
     <div className="space-y-4">
       <SalesHeader
-        showProducts={state.showProducts}
+        showProducts={uiState.showProducts}
         orders={orders}
-        currentOrderId={state.currentOrder?.id}
-        onShowProducts={(show) =>
-          setState((prev) => ({
-            ...prev,
-            showProducts: show,
-            currentOrder: show ? null : prev.currentOrder,
-          }))
-        }
-        onSelectOrder={(orderId) =>
-          setState((prev) => ({
-            ...prev,
-            currentOrder: orderId
-              ? orders.find((o) => o.id === orderId) || null
-              : null,
-          }))
-        }
-        onNewOrder={() =>
-          setState((prev) => ({ ...prev, isNewOrderModalOpen: true }))
-        }
+        currentOrderId={currentOrder?.id}
+        onShowProducts={(show) => {
+          uiActions.setShowProducts(show);
+          if (show) {
+            uiActions.selectOrder(null);
+          }
+        }}
+        onSelectOrder={(orderId) => uiActions.selectOrder(orderId)}
+        onNewOrder={() => uiActions.openNewOrderModal()}
       />
 
-      {state.currentOrder && !state.showProducts && (
+      {currentOrder && !uiState.showProducts && (
         <OrderSection
-          order={state.currentOrder}
+          order={currentOrder}
           onUpdateItem={handleUpdateOrderItem}
           onRemoveItem={handleRemoveOrderItem}
-          onFinalize={() =>
-            setState((prev) => ({ ...prev, isPaymentModalOpen: true }))
-          }
+          onFinalize={() => uiActions.openPaymentModal()}
           onDelete={() => {
-            const currentOrderId = state.currentOrder?.id;
-            if (currentOrderId) {
-              removeOrder(currentOrderId);
-              setState((prev) => ({ ...prev, currentOrder: null }));
+            if (currentOrder.id) {
+              removeOrder(currentOrder.id);
+              uiActions.selectOrder(null);
             }
           }}
           calculateOrderTotal={calculateOrderTotal}
@@ -89,16 +78,16 @@ export function SalesProcessing() {
       )}
 
       <main className="min-h-[500px]">
-        {!state.showProducts ? (
+        {!uiState.showProducts ? (
           <ProductCategories
             categories={getAvailableCategories()}
-            selectedCategory={state.selectedCategory}
+            selectedCategory={uiState.selectedCategory}
             onSelectCategory={handleCategorySelect}
           />
         ) : (
           <ProductList
             products={products.filter(
-              (p) => p.category === state.selectedCategory
+              (p) => p.category === uiState.selectedCategory
             )}
             onProductSelect={handleProductSelect}
           />
@@ -109,32 +98,26 @@ export function SalesProcessing() {
             items={temporaryItems}
             onRemoveItem={handleRemoveFromCart}
             onUpdateItem={handleUpdateCartItem}
-            onProceed={() =>
-              setState((prev) => ({ ...prev, isActionModalOpen: true }))
-            }
+            onProceed={() => uiActions.openActionModal()}
             hasOpenOrders={orders.length > 0}
           />
         )}
       </main>
 
       <WeightInputModal
-        isOpen={state.isWeightModalOpen}
-        onClose={() =>
-          setState((prev) => ({ ...prev, isWeightModalOpen: false }))
-        }
+        isOpen={uiState.isWeightModalOpen}
+        onClose={() => uiActions.closeModal("isWeightModalOpen")}
         onConfirm={handleWeightConfirm}
-        productName={state.selectedProduct?.name || ""}
+        productName={uiState.selectedProduct?.name || ""}
       />
 
       <PaymentMethodSelection
-        isOpen={state.isPaymentModalOpen}
-        onClose={() =>
-          setState((prev) => ({ ...prev, isPaymentModalOpen: false }))
-        }
+        isOpen={uiState.isPaymentModalOpen}
+        onClose={() => uiActions.closeModal("isPaymentModalOpen")}
         onSelect={handlePayment}
         total={
-          state.currentOrder
-            ? calculateOrderTotal(state.currentOrder)
+          currentOrder
+            ? calculateOrderTotal(currentOrder)
             : temporaryItems.reduce(
                 (sum, item) => sum + calculateItemTotal(item),
                 0
@@ -143,22 +126,26 @@ export function SalesProcessing() {
       />
 
       <ActionSelectionModal
-        isOpen={state.isActionModalOpen}
-        onClose={() =>
-          setState((prev) => ({ ...prev, isActionModalOpen: false }))
-        }
+        isOpen={uiState.isActionModalOpen}
+        onClose={() => uiActions.closeModal("isActionModalOpen")}
         onSelectAction={handleActionSelection}
         orders={orders}
-        productName={state.selectedProduct?.name || ""}
+        productName={uiState.selectedProduct?.name || ""}
       />
 
       <CustomizeProductModal
-        isOpen={state.isCustomizeModalOpen}
-        onClose={() =>
-          setState((prev) => ({ ...prev, isCustomizeModalOpen: false }))
-        }
-        product={state.selectedProduct!}
+        isOpen={uiState.isCustomizeModalOpen}
+        onClose={() => uiActions.closeModal("isCustomizeModalOpen")}
+        product={uiState.selectedProduct!}
         onConfirm={handleCustomizeConfirm}
+      />
+
+      <NewOrderModal
+        isOpen={uiState.isNewOrderModalOpen}
+        onClose={() => uiActions.closeModal("isNewOrderModalOpen")}
+        onConfirm={(customerName: string) => {
+          handleActionSelection("new_order", customerName);
+        }}
       />
     </div>
   );

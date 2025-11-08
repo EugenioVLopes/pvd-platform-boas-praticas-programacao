@@ -1,62 +1,32 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 
-import { useCart } from "@/hooks/sales/use-cart";
-import { useOrders } from "@/hooks/use-orders";
-import { useProducts } from "@/hooks/use-products";
-import { useToast } from "@/hooks/use-toast";
-import { useVendas } from "@/hooks/use-vendas";
-import { PAYMENT_METHODS } from "@/lib/constants/products";
+import { useOrders } from "@/hooks/business/use-orders";
+import { useProducts } from "@/hooks/business/use-products";
+import { CompleteSaleData, useSales } from "@/hooks/business/use-sales";
+import { useToast } from "@/hooks/core/use-toast";
+import { useCart } from "@/hooks/ui/use-cart";
+import { useSalesUI } from "@/hooks/ui/use-sales-ui";
 import { formatCurrency } from "@/lib/utils";
 import type { Order, PaymentMethod } from "@/types/order";
 import type { Product, SaleItem } from "@/types/product";
 
-interface SalesState {
-  currentOrder: Order | null;
-  selectedProduct: Product | null;
-  showProducts: boolean;
-  selectedCategory: string | null;
-  isWeightModalOpen: boolean;
-  isNewOrderModalOpen: boolean;
-  newOrderName: string;
-  isPaymentModalOpen: boolean;
-  isActionModalOpen: boolean;
-  isCustomizeModalOpen: boolean;
-}
-
 export function useSalesProcessing() {
-  const [state, setState] = useState<SalesState>({
-    currentOrder: null,
-    selectedProduct: null,
-    showProducts: false,
-    selectedCategory: null,
-    isWeightModalOpen: false,
-    isNewOrderModalOpen: false,
-    newOrderName: "",
-    isPaymentModalOpen: false,
-    isActionModalOpen: false,
-    isCustomizeModalOpen: false,
-  });
-
+  // Hooks consolidados
   const { products } = useProducts();
   const {
     items: temporaryItems,
-    addToCart,
-    removeFromCart,
+    addItem,
+    removeItem,
     clearCart,
+    getItemTotal,
   } = useCart();
   const { orders, updateOrder, removeOrder, addOrder } = useOrders();
   const { toast } = useToast();
-  const { adicionarVenda } = useVendas();
+  const { completeSale, loading: salesLoading, error: salesError } = useSales();
+  const { state: uiState, actions: uiActions } = useSalesUI();
 
-  const calculateItemTotal = useCallback((item: SaleItem) => {
-    if (item.product.type === "weight" && item.weight) {
-      return (item.product.price * item.weight) / 1000;
-    }
-    return (
-      item.product.price * (item.quantity || 1) +
-      (item.addons?.reduce((sum, addon) => sum + addon.price, 0) || 0)
-    );
-  }, []);
+  // Usar função de cálculo do useCart para consistência
+  const calculateItemTotal = getItemTotal;
 
   const calculateOrderTotal = useMemo(
     () => (order: Order) =>
@@ -64,56 +34,44 @@ export function useSalesProcessing() {
     [calculateItemTotal]
   );
 
-  const handleCategorySelect = useCallback((category: string) => {
-    setState((prev) => ({
-      ...prev,
-      selectedCategory: category,
-      showProducts: true,
-    }));
-  }, []);
+  // Handlers de categoria usando o novo hook de UI
+  const handleCategorySelect = useCallback(
+    (category: string) => {
+      uiActions.selectCategory(category);
+    },
+    [uiActions]
+  );
 
+  // Handlers de produto usando o novo hook de UI
   const handleProductSelect = useCallback(
     (product: Product) => {
       if (product.type === "weight") {
-        setState((prev) => ({
-          ...prev,
-          selectedProduct: product,
-          isWeightModalOpen: true,
-        }));
+        uiActions.openWeightModal(product);
       } else if (product.options) {
-        setState((prev) => ({
-          ...prev,
-          selectedProduct: product,
-          isCustomizeModalOpen: true,
-        }));
+        uiActions.openCustomizeModal(product);
       } else {
-        addToCart(product, 1);
-        setState((prev) => ({
-          ...prev,
-          showProducts: false,
-          selectedCategory: null,
-        }));
+        addItem(product, { quantity: 1 });
+        uiActions.setShowProducts(false);
+        uiActions.selectCategory(null);
       }
     },
-    [addToCart]
+    [addItem, uiActions]
   );
 
+  // Handler de confirmação de peso usando o novo hook de UI
   const handleWeightConfirm = useCallback(
     (weight: number) => {
-      if (state.selectedProduct) {
-        addToCart(state.selectedProduct, 1, weight);
+      if (uiState.selectedProduct) {
+        addItem(uiState.selectedProduct, { quantity: 1, weight });
       }
-      setState((prev) => ({
-        ...prev,
-        isWeightModalOpen: false,
-        selectedProduct: null,
-        showProducts: false,
-        selectedCategory: null,
-      }));
+      uiActions.closeModal("isWeightModalOpen");
+      uiActions.setShowProducts(false);
+      uiActions.selectCategory(null);
     },
-    [state.selectedProduct, addToCart]
+    [uiState.selectedProduct, addItem, uiActions]
   );
 
+  // Handler de customização usando o novo hook de UI
   const handleCustomizeConfirm = useCallback(
     (
       selectedOptions: {
@@ -123,96 +81,114 @@ export function useSalesProcessing() {
       },
       addons: Product[] = []
     ) => {
-      if (state.selectedProduct) {
-        addToCart(state.selectedProduct, 1, undefined, addons, selectedOptions);
+      if (uiState.selectedProduct) {
+        addItem(uiState.selectedProduct, {
+          quantity: 1,
+          addons,
+          selectedOptions,
+        });
         console.log("Item adicionado:", {
-          product: state.selectedProduct.name,
+          product: uiState.selectedProduct.name,
           addons,
           selectedOptions,
         });
       }
-      setState((prev) => ({
-        ...prev,
-        selectedProduct: null,
-        showProducts: false,
-        selectedCategory: null,
-        isCustomizeModalOpen: false,
-      }));
+      uiActions.closeModal("isCustomizeModalOpen");
+      uiActions.setShowProducts(false);
+      uiActions.selectCategory(null);
     },
-    [state.selectedProduct, addToCart]
+    [uiState.selectedProduct, addItem, uiActions]
   );
+  // Handler de pagamento usando o novo hook de vendas
   const handlePayment = useCallback(
-    (paymentMethod: PaymentMethod, cashAmount?: number) => {
-      const orderToFinalize = state.currentOrder || {
-        id: crypto.randomUUID(),
-        customerName: "Venda Direta",
-        items: temporaryItems,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        status: "completed",
-      };
+    async (paymentMethod: PaymentMethod, cashAmount?: number) => {
+      try {
+        uiActions.setPaymentProcessing(true);
 
-      const total = calculateOrderTotal(orderToFinalize);
-      const vendaFinalizada = {
-        ...orderToFinalize,
-        paymentMethod: PAYMENT_METHODS[paymentMethod],
-        total,
-        cashAmount,
-        change: cashAmount ? cashAmount - total : 0,
-        finalizadaEm: new Date(),
-      };
+        // Determinar o pedido a finalizar
+        const currentOrder = uiState.currentOrderId
+          ? orders.find((o) => o.id === uiState.currentOrderId)
+          : null;
 
-      adicionarVenda(vendaFinalizada);
+        const customerName = currentOrder?.customerName || "Venda Direta";
+        const itemsToFinalize = currentOrder?.items || temporaryItems;
 
-      if (state.currentOrder) {
-        removeOrder(state.currentOrder.id);
+        // Preparar dados da venda
+        const saleData: CompleteSaleData = {
+          customerName,
+          items: itemsToFinalize,
+          paymentMethod,
+          cashAmount,
+        };
+
+        // Finalizar venda usando o novo hook
+        await completeSale(saleData);
+
+        // Limpar estado após sucesso
+        if (currentOrder) {
+          removeOrder(currentOrder.id);
+        }
+
+        uiActions.closeModal("isPaymentModalOpen");
+        uiActions.selectOrder(null);
+        clearCart();
+
+        // Calcular total para exibição
+        const total = itemsToFinalize.reduce(
+          (sum, item) => sum + calculateItemTotal(item),
+          0
+        );
+        const change = cashAmount ? cashAmount - total : 0;
+
+        toast({
+          title: "Venda Finalizada",
+          description: `Venda finalizada para ${customerName}. Total: ${formatCurrency(total)}${cashAmount ? `. Troco: ${formatCurrency(change)}` : ""}`,
+        });
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : "Erro ao finalizar venda";
+        toast({
+          title: "Erro",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      } finally {
+        uiActions.setPaymentProcessing(false);
       }
-
-      setState((prev) => ({
-        ...prev,
-        currentOrder: null,
-        isPaymentModalOpen: false,
-      }));
-      clearCart();
-
-      toast({
-        title: "Venda Finalizada",
-        description: `Venda finalizada para ${orderToFinalize.customerName}. Total: ${formatCurrency(total)}. Método: ${PAYMENT_METHODS[paymentMethod]}${cashAmount ? `. Troco: ${formatCurrency(cashAmount - total)}` : ""}`,
-      });
     },
     [
-      state.currentOrder,
+      uiState.currentOrderId,
+      orders,
       temporaryItems,
-      calculateOrderTotal,
+      completeSale,
       removeOrder,
       clearCart,
+      calculateItemTotal,
       toast,
-      adicionarVenda,
+      uiActions,
     ]
   );
 
+  // Criação de novo pedido usando o hook de UI
   const createNewOrder = useCallback(
     (customerName: string) => {
-      const newOrder: Order = {
-        id: crypto.randomUUID(),
+      const orderData = {
         customerName,
         items: temporaryItems,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        status: "open",
+        status: "open" as const,
       };
-      addOrder(newOrder);
-      setState((prev) => ({
-        ...prev,
-        currentOrder: newOrder,
-        newOrderName: "",
-        isNewOrderModalOpen: false,
-      }));
+
+      addOrder(orderData);
+
+      // Limpar seleção atual já que criamos um novo pedido
+      uiActions.closeModal("isNewOrderModalOpen");
+      uiActions.setNewOrderName("");
       clearCart();
     },
-    [addOrder, temporaryItems, clearCart]
+    [addOrder, temporaryItems, clearCart, uiActions]
   );
 
+  // Handler de seleção de ação usando o hook de UI
   const handleActionSelection = useCallback(
     (
       action: "add_to_order" | "finalize_sale" | "new_order",
@@ -220,45 +196,64 @@ export function useSalesProcessing() {
     ) => {
       if (action === "new_order" && orderIdOrName) {
         createNewOrder(orderIdOrName);
+        toast({
+          title: "Comanda Criada",
+          description: `Comanda criada para ${orderIdOrName}`,
+        });
       } else if (action === "add_to_order" && orderIdOrName) {
         const order = orders.find((o: Order) => o.id === orderIdOrName);
         if (order) {
-          updateOrder({
-            ...order,
+          updateOrder(order.id, {
             items: [...order.items, ...temporaryItems],
-            updatedAt: new Date(),
           });
           clearCart();
+          toast({
+            title: "Produtos Adicionados",
+            description: `${temporaryItems.length} produto(s) adicionado(s) à comanda de ${order.customerName}`,
+          });
+          // Selecionar a comanda para visualização
+          uiActions.selectOrder(orderIdOrName);
+        } else {
+          toast({
+            title: "Erro",
+            description: "Comanda não encontrada",
+            variant: "destructive",
+          });
         }
       } else if (action === "finalize_sale") {
-        setState((prev) => ({ ...prev, isPaymentModalOpen: true }));
+        uiActions.openPaymentModal();
       }
-      setState((prev) => ({
-        ...prev,
-        isActionModalOpen: false,
-        showProducts: false,
-        currentOrder: null,
-      }));
+
+      // Limpar estado da UI
+      uiActions.closeModal("isActionModalOpen");
+      uiActions.setShowProducts(false);
+      // Não limpar a seleção se produtos foram adicionados a uma comanda
+      if (action !== "add_to_order") {
+        uiActions.selectOrder(null);
+      }
     },
-    [orders, temporaryItems, updateOrder, createNewOrder, clearCart]
+    [
+      orders,
+      temporaryItems,
+      updateOrder,
+      createNewOrder,
+      clearCart,
+      uiActions,
+      toast,
+    ]
   );
 
+  // Handlers de atualização de itens do pedido
   const handleUpdateOrderItem = useCallback(
     (orderId: string, itemIndex: number, updatedItem: SaleItem) => {
       const order = orders.find((o) => o.id === orderId);
       if (order) {
         const updatedItems = [...order.items];
         updatedItems[itemIndex] = updatedItem;
-        updateOrder({ ...order, items: updatedItems, updatedAt: new Date() });
-        if (state.currentOrder?.id === orderId) {
-          setState((prev) => ({
-            ...prev,
-            currentOrder: { ...order, items: updatedItems },
-          }));
-        }
+        updateOrder(order.id, { items: updatedItems });
       }
     },
-    [orders, updateOrder, state.currentOrder]
+    [orders, updateOrder]
   );
 
   const handleRemoveOrderItem = useCallback(
@@ -266,25 +261,53 @@ export function useSalesProcessing() {
       const order = orders.find((o) => o.id === orderId);
       if (order) {
         const updatedItems = order.items.filter((_, idx) => idx !== itemIndex);
-        updateOrder({ ...order, items: updatedItems, updatedAt: new Date() });
-        if (state.currentOrder?.id === orderId) {
-          setState((prev) => ({
-            ...prev,
-            currentOrder: { ...order, items: updatedItems },
-          }));
-        }
+        updateOrder(order.id, { items: updatedItems });
       }
     },
-    [orders, updateOrder, state.currentOrder]
+    [orders, updateOrder]
   );
 
+  // Handler otimizado para atualizar item do carrinho
+  const handleUpdateCartItem = useCallback(
+    (index: number, item: SaleItem) => {
+      removeItem(index);
+      addItem(item.product, {
+        quantity: item.quantity || 1,
+        weight: item.weight,
+        addons: item.addons,
+        selectedOptions: item.selectedOptions,
+      });
+    },
+    [removeItem, addItem]
+  );
+
+  // Obter pedido atual baseado no ID selecionado
+  const currentOrder = useMemo(() => {
+    return uiState.currentOrderId
+      ? orders.find((o) => o.id === uiState.currentOrderId) || null
+      : null;
+  }, [uiState.currentOrderId, orders]);
+
   return {
-    state,
-    setState,
+    // Estado consolidado
+    uiState,
+    uiActions,
+    currentOrder,
+
+    // Dados
     products,
     temporaryItems,
     orders,
+
+    // Estados de loading/error
+    salesLoading,
+    salesError,
+
+    // Funções de cálculo
     calculateOrderTotal,
+    calculateItemTotal,
+
+    // Handlers principais
     handleCategorySelect,
     handleProductSelect,
     handleWeightConfirm,
@@ -292,13 +315,14 @@ export function useSalesProcessing() {
     handlePayment,
     createNewOrder,
     handleActionSelection,
+
+    // Handlers de pedidos
     handleUpdateOrderItem,
     handleRemoveOrderItem,
-    handleRemoveFromCart: removeFromCart,
-    handleUpdateCartItem: (index: number, item: SaleItem) => {
-      removeFromCart(index);
-      addToCart(item.product, item.quantity || 1, item.weight, item.addons);
-    },
     removeOrder,
+
+    // Handlers de carrinho
+    handleRemoveFromCart: removeItem,
+    handleUpdateCartItem,
   };
 }
