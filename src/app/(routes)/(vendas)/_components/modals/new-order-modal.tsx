@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,20 +25,25 @@ export function NewOrderModal({
   onConfirm,
 }: NewOrderModalProps) {
   const [customerName, setCustomerName] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleConfirm = () => {
+    setError(null);
+
     if (!customerName.trim()) {
-      alert("Por favor, insira o nome do cliente.");
+      setError("Por favor, insira o nome do cliente.");
       return;
     }
 
     onConfirm(customerName.trim());
     setCustomerName("");
+    setError(null);
     onClose();
   };
 
   const handleClose = () => {
     setCustomerName("");
+    setError(null);
     onClose();
   };
 
@@ -48,27 +54,40 @@ export function NewOrderModal({
           <DialogTitle>Nova Comanda</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="customerName">Nome do Cliente</Label>
             <Input
               id="customerName"
               placeholder="Digite o nome do cliente"
               value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
+              onChange={(e) => {
+                setCustomerName(e.target.value);
+                setError(null);
+              }}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleConfirm();
                 }
               }}
               autoFocus
+              className={error ? "border-destructive" : ""}
             />
           </div>
-        </div>
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={handleClose}>
-            Cancelar
-          </Button>
-          <Button onClick={handleConfirm}>Criar Comanda</Button>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={handleClose}>
+              Cancelar
+            </Button>
+            <Button onClick={handleConfirm} disabled={!customerName.trim()}>
+              Criar Comanda
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/utils";
 import type { PaymentMethod } from "@/types/order";
 
@@ -180,38 +181,33 @@ export function PaymentMethodSelection({
         </DialogHeader>
         <div className="space-y-4">
           {error && (
-            <Alert variant="destructive" className="border-red-500">
+            <Alert variant="destructive">
               <AlertTitle>Erro ao Processar Pagamento</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {PAYMENT_METHODS.map((method) => (
               <Card
                 key={method.type}
-                className={`hover:border-primary cursor-pointer transition-colors ${
+                className={`cursor-pointer transition-all hover:border-primary hover:shadow-md ${
                   selectedMethod === method.type
-                    ? "bg-primary text-primary-foreground"
-                    : ""
+                    ? "border-primary bg-primary text-primary-foreground shadow-md"
+                    : "border-border"
                 }`}
                 onClick={() => handleMethodSelect(method.type)}
               >
-                <CardContent className="flex flex-col items-center justify-center p-4">
-                  {method.icon}
-                  <span className="mt-2">{method.label}</span>
+                <CardContent className="flex flex-col items-center justify-center p-6">
+                  <div className="mb-2">{method.icon}</div>
+                  <span className="text-sm font-medium">{method.label}</span>
                 </CardContent>
               </Card>
             ))}
           </div>
 
           <div className="space-y-2">
-            <label
-              htmlFor="adjustedTotal"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Valor final da venda
-            </label>
+            <Label htmlFor="adjustedTotal">Valor final da venda</Label>
             <Input
               id="adjustedTotal"
               type="number"
@@ -224,12 +220,15 @@ export function PaymentMethodSelection({
               step="0.01"
               min={initialTotal * 0.9} // Limita o input para no máximo 10% de desconto
               max={initialTotal}
-              className={error ? "border-red-500" : ""}
+              className={error ? "border-destructive" : ""}
             />
             {Number(adjustedTotal) < initialTotal && (
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Desconto aplicado:{" "}
-                {formatCurrency(initialTotal - Number(adjustedTotal))}(
+                <span className="font-medium text-primary">
+                  {formatCurrency(initialTotal - Number(adjustedTotal))}
+                </span>{" "}
+                (
                 {(
                   ((initialTotal - Number(adjustedTotal)) / initialTotal) *
                   100
@@ -241,12 +240,7 @@ export function PaymentMethodSelection({
 
           {selectedMethod === "CASH" && (
             <div className="space-y-2">
-              <label
-                htmlFor="cashAmount"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Valor recebido em dinheiro
-              </label>
+              <Label htmlFor="cashAmount">Valor recebido em dinheiro</Label>
               <Input
                 id="cashAmount"
                 type="number"
@@ -255,24 +249,38 @@ export function PaymentMethodSelection({
                 placeholder={`Valor mínimo: ${formatCurrency(Number(adjustedTotal))}`}
                 min={Number(adjustedTotal)}
                 step="0.01"
-                className={error ? "border-red-500" : ""}
+                className={error ? "border-destructive" : ""}
               />
               {isValidCashAmount && cashAmount && (
-                <div className="space-y-1 text-sm">
-                  <p>
-                    Valor total da compra:{" "}
-                    {formatCurrency(Number(adjustedTotal))}
-                  </p>
-                  <p>Valor recebido: {formatCurrency(Number(cashAmount))}</p>
-                  <p className="font-medium">
-                    Troco: {formatCurrency(calculaTroco())}
-                  </p>
+                <div className="space-y-1 rounded-md bg-muted p-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Valor total da compra:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(Number(adjustedTotal))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Valor recebido:
+                    </span>
+                    <span className="font-medium">
+                      {formatCurrency(Number(cashAmount))}
+                    </span>
+                  </div>
+                  <div className="flex justify-between border-t pt-1">
+                    <span className="font-semibold">Troco:</span>
+                    <span className="font-semibold text-primary">
+                      {formatCurrency(calculaTroco())}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end gap-2 pt-2">
             <Button variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
