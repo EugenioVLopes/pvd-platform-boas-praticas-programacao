@@ -2,8 +2,8 @@
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
 
-import { useSalesReport } from "@/hooks/use-sales-report";
-import { useVendas } from "@/hooks/use-vendas";
+import { useSales } from "@/hooks/business/use-sales";
+import { useSalesReport } from "@/hooks/reports/use-sales-report";
 import { getDateRangeForReportType } from "@/lib/utils/sales-report";
 
 import { AuthGuard } from "../../../../components/auth/auth-guard";
@@ -12,7 +12,7 @@ import { SalesReportMetrics } from "./_components/dashboard-metrics";
 import { SalesReportTabs } from "./_components/dashboard-tabs";
 
 export default function DashboardPage() {
-  const { vendas } = useVendas();
+  const { completedSales } = useSales();
 
   // Estado inicial: relatório do dia atual
   const today = new Date();
@@ -25,7 +25,7 @@ export default function DashboardPage() {
   );
 
   const report = useSalesReport({
-    orders: vendas,
+    orders: completedSales,
     dateRange,
   });
 

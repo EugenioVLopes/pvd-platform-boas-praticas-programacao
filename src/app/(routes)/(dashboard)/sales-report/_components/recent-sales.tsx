@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useVendas } from "@/hooks/use-vendas";
+import { useSales } from "@/hooks/business/use-sales";
 import { formatCurrency } from "@/lib/utils";
 import { formatDate } from "@/lib/utils/calculations";
 
@@ -14,7 +14,7 @@ interface RecentSalesProps {
 }
 
 export function RecentSales({ limit = 5 }: RecentSalesProps) {
-  const { vendas } = useVendas();
+  const { completedSales } = useSales();
 
   // Estado para controlar a visualização de todas as vendas do dia
   const [showAllDailySales, setShowAllDailySales] = useState(false);
@@ -27,24 +27,24 @@ export function RecentSales({ limit = 5 }: RecentSalesProps) {
 
   // Filtra as vendas do dia atual para o modo "ver todas"
   const dailySales = useMemo(() => {
-    return vendas.filter((venda) => {
+    return completedSales.filter((venda) => {
       const vendaDate = new Date(venda.finalizadaEm || venda.createdAt);
       const endOfDay = new Date(today);
       endOfDay.setHours(23, 59, 59, 999);
       return vendaDate >= today && vendaDate <= endOfDay;
     });
-  }, [vendas, today]);
+  }, [completedSales, today]);
 
   // Ordena e limita as vendas recentes
   const recentSales = useMemo(() => {
-    return vendas
+    return completedSales
       .sort(
         (a, b) =>
           new Date(b.finalizadaEm || b.createdAt).getTime() -
           new Date(a.finalizadaEm || a.createdAt).getTime()
       )
       .slice(0, limit); // Pega as `limit` vendas mais recentes
-  }, [vendas, limit]);
+  }, [completedSales, limit]);
 
   // Determina quais vendas exibir: recentes ou todas do dia, dependendo do estado
   const salesToDisplay = showAllDailySales ? dailySales : recentSales;

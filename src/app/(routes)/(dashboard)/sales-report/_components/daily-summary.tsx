@@ -3,17 +3,17 @@
 import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useVendas } from "@/hooks/use-vendas";
+import { useSales } from "@/hooks/business/use-sales";
 import { formatCurrency } from "@/lib/utils";
 
 export function DailySummary() {
-  const { vendas } = useVendas();
+  const { completedSales } = useSales();
 
   const { totaisPorMetodo, totalDoDia } = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const vendasHoje = vendas.filter((venda) => {
+    const vendasHoje = completedSales.filter((venda) => {
       const vendaDate = new Date(venda.finalizadaEm || venda.createdAt);
       return vendaDate >= today;
     });
@@ -55,7 +55,7 @@ export function DailySummary() {
     );
 
     return { totaisPorMetodo, totalDoDia };
-  }, [vendas]);
+  }, [completedSales]);
 
   return (
     <Card className="mx-auto w-full rounded-lg shadow-md transition-shadow duration-300 hover:shadow-lg">
