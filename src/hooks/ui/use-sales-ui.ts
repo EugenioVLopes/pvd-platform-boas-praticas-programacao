@@ -9,7 +9,6 @@ import type { Product } from "@/types/product";
  * Estado completo da interface de vendas
  */
 export interface SalesUIState {
-  // Estados de modais
   isWeightModalOpen: boolean;
   isPaymentModalOpen: boolean;
   isCustomizeModalOpen: boolean;
@@ -17,16 +16,12 @@ export interface SalesUIState {
   isActionModalOpen: boolean;
   isProductDetailsOpen: boolean;
   isCategoryOpen: boolean;
-
-  // Seleções e dados temporários
   selectedProduct: Product | null;
   selectedCategory: string | null;
   currentOrderId: string | null;
   newOrderName: string;
   currentProduct: Product | null;
   currentCategory: string | null;
-
-  // Estados de visualização
   showProducts: boolean;
   showOrderDetails: boolean;
   paymentProcessing: boolean;
@@ -46,7 +41,6 @@ export interface UseSalesUIOptions extends BaseHookOptions {
  * Ações disponíveis para gerenciar o estado da UI
  */
 export interface SalesUIActions {
-  // Ações de modais
   openWeightModal: (product: Product) => void;
   openPaymentModal: () => void;
   openCustomizeModal: (product: Product) => void;
@@ -67,21 +61,15 @@ export interface SalesUIActions {
       | "isCategoryOpen"
     >
   ) => void;
-
-  // Ações de seleção
   selectCategory: (category: string | null) => void;
   selectProduct: (product: Product | null) => void;
   selectOrder: (orderId: string | null) => void;
   setNewOrderName: (name: string) => void;
-
-  // Ações de visualização
   toggleProductsView: () => void;
   toggleOrderDetails: () => void;
   setShowProducts: (show: boolean) => void;
   setShowOrderDetails: (show: boolean) => void;
   setPaymentProcessing: (processing: boolean) => void;
-
-  // Ação geral para atualizar estado
   updateState: (updates: Partial<SalesUIState>) => void;
   resetState: () => void;
 }
@@ -92,8 +80,6 @@ export interface SalesUIActions {
 export interface UseSalesUIReturn {
   state: SalesUIState;
   actions: SalesUIActions;
-
-  // Helpers computados
   hasOpenModal: boolean;
   currentModal: string | null;
   canShowProducts: boolean;
@@ -103,7 +89,6 @@ export interface UseSalesUIReturn {
  * Estado inicial padrão
  */
 const DEFAULT_STATE: SalesUIState = {
-  // Modais
   isWeightModalOpen: false,
   isPaymentModalOpen: false,
   isCustomizeModalOpen: false,
@@ -111,16 +96,12 @@ const DEFAULT_STATE: SalesUIState = {
   isActionModalOpen: false,
   isProductDetailsOpen: false,
   isCategoryOpen: false,
-
-  // Seleções
   selectedProduct: null,
   selectedCategory: null,
   currentOrderId: null,
   newOrderName: "",
   currentProduct: null,
   currentCategory: null,
-
-  // Visualizações
   showProducts: false,
   showOrderDetails: false,
   paymentProcessing: false,
@@ -176,15 +157,11 @@ const DEFAULT_STATE: SalesUIState = {
 export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
   const { enabled = true, initialState = {}, autoReset = true } = options;
 
-  // Estado combinado (padrão + personalizado)
   const [state, setState] = useState<SalesUIState>({
     ...DEFAULT_STATE,
     ...initialState,
   });
 
-  /**
-   * Atualiza o estado com validações
-   */
   const updateState = useCallback(
     (updates: Partial<SalesUIState>) => {
       if (!enabled) return;
@@ -194,16 +171,11 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     [enabled]
   );
 
-  /**
-   * Reseta o estado para o padrão
-   */
   const resetState = useCallback(() => {
     if (!enabled) return;
 
     setState({ ...DEFAULT_STATE, ...initialState });
   }, [enabled, initialState]);
-
-  // === AÇÕES DE MODAIS ===
 
   const openWeightModal = useCallback(
     (product: Product) => {
@@ -284,7 +256,6 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
         [modalName]: false,
       };
 
-      // Auto-reset relacionado se habilitado
       if (autoReset) {
         switch (modalName) {
           case "isWeightModalOpen":
@@ -330,8 +301,6 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     updateState(updates);
   }, [updateState, autoReset]);
 
-  // === AÇÕES DE SELEÇÃO ===
-
   const selectCategory = useCallback(
     (category: string | null) => {
       updateState({
@@ -369,8 +338,6 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     },
     [updateState]
   );
-
-  // === AÇÕES DE VISUALIZAÇÃO ===
 
   const toggleProductsView = useCallback(() => {
     updateState({
@@ -411,8 +378,6 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     [updateState]
   );
 
-  // === HELPERS COMPUTADOS ===
-
   const hasOpenModal = !!(
     state.isWeightModalOpen ||
     state.isPaymentModalOpen ||
@@ -443,9 +408,7 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
 
   const canShowProducts = !hasOpenModal && !!state.selectedCategory;
 
-  // Objeto de ações
   const actions: SalesUIActions = {
-    // Modais
     openWeightModal,
     openPaymentModal,
     openCustomizeModal,
@@ -455,21 +418,15 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     openCategoryModal,
     closeModal,
     closeAllModals,
-
-    // Seleções
     selectCategory,
     selectProduct,
     selectOrder,
     setNewOrderName,
-
-    // Visualizações
     toggleProductsView,
     toggleOrderDetails,
     setShowProducts,
     setShowOrderDetails,
     setPaymentProcessing,
-
-    // Gerais
     updateState,
     resetState,
   };

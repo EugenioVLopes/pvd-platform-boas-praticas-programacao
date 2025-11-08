@@ -3,13 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { BaseHookOptions, PersistenceOptions } from "@/types/hooks";
 import type { Product, SaleItem } from "@/types/product";
 
-// NOTE: Comprehensive cart interfaces have been created in src/types/cart.ts
-// These provide enhanced error handling, validation, and operation results
-// Future implementation should migrate to use these enhanced interfaces
-// @see src/types/cart.ts for complete interface definitions
-// @see src/utils/cart-utils.ts for utility functions
-// @see src/docs/cart-interfaces.md for usage documentation
-
 /**
  * Tipos de erro que podem ocorrer no carrinho
  */

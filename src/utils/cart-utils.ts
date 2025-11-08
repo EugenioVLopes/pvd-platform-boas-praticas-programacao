@@ -74,7 +74,6 @@ export class CartUtils {
     const errors: CartError[] = [];
     const warnings: string[] = [];
 
-    // Validar produto
     if (!item.product || !item.product.id) {
       errors.push(
         this.createError(
@@ -84,7 +83,6 @@ export class CartUtils {
       );
     }
 
-    // Validar peso para produtos vendidos por peso
     if (
       config.requireWeightForWeightProducts !== false &&
       item.product?.type === "weight"
@@ -102,7 +100,6 @@ export class CartUtils {
           )
         );
       } else {
-        // Validar limites de peso
         const minWeight =
           config.minimumWeight || CART_VALIDATION_CONSTANTS.MIN_WEIGHT;
         const maxWeight =
@@ -138,7 +135,6 @@ export class CartUtils {
       }
     }
 
-    // Validar quantidade
     if (item.quantity !== undefined) {
       const minQuantity =
         config.minimumQuantity || CART_VALIDATION_CONSTANTS.MIN_QUANTITY;
@@ -172,7 +168,6 @@ export class CartUtils {
       }
     }
 
-    // Executar validadores customizados
     if (config.customValidators) {
       for (const validator of config.customValidators) {
         const customError = validator(item);
@@ -182,7 +177,6 @@ export class CartUtils {
       }
     }
 
-    // Avisos para melhorias
     if (item.product?.price === 0) {
       warnings.push("Produto com preço zero");
     }
@@ -225,7 +219,6 @@ export class CartUtils {
       };
     }
 
-    // Calcular valores básicos
     const subtotal = items.reduce((sum, item) => {
       return sum + this.calculateItemTotal(item);
     }, 0);
@@ -241,7 +234,6 @@ export class CartUtils {
       return sum + (item.weight || 0);
     }, 0);
 
-    // Encontrar itens mais caro e mais barato
     const itemTotals = items.map((item) => ({
       item,
       total: this.calculateItemTotal(item),
@@ -251,7 +243,6 @@ export class CartUtils {
     const cheapestItem = sortedByPrice[0]?.item;
     const mostExpensiveItem = sortedByPrice[sortedByPrice.length - 1]?.item;
 
-    // Extrair categorias únicas
     const categories = Array.from(
       new Set(items.map((item) => item.product?.category).filter(Boolean))
     ) as string[];
@@ -287,19 +278,15 @@ export class CartUtils {
 
     if (!item.product) return 0;
 
-    // Preço base do produto
     if (item.product.type === "weight" && item.weight) {
-      // Produtos vendidos por peso (preço por kg, peso em gramas)
       total = (item.product.price * item.weight) / 1000;
     } else {
-      // Produtos vendidos por unidade
       total = item.product.price;
       if (item.quantity) {
         total *= item.quantity;
       }
     }
 
-    // Adicionar preço dos addons
     if (item.addons?.length) {
       const addonsTotal = item.addons.reduce(
         (sum, addon) => sum + addon.price,
@@ -328,17 +315,14 @@ export class CartUtils {
    */
   static filterItems(items: SaleItem[], filter: CartItemFilter): SaleItem[] {
     return items.filter((item) => {
-      // Filtro por categoria
       if (filter.category && item.product?.category !== filter.category) {
         return false;
       }
 
-      // Filtro por tipo de produto
       if (filter.productType && item.product?.type !== filter.productType) {
         return false;
       }
 
-      // Filtro por faixa de preço
       if (filter.priceRange) {
         const itemTotal = this.calculateItemTotal(item);
         if (filter.priceRange.min && itemTotal < filter.priceRange.min) {
@@ -349,7 +333,6 @@ export class CartUtils {
         }
       }
 
-      // Filtro por peso
       if (filter.weightRange && item.weight) {
         if (filter.weightRange.min && item.weight < filter.weightRange.min) {
           return false;
@@ -359,7 +342,6 @@ export class CartUtils {
         }
       }
 
-      // Filtro por quantidade
       if (filter.quantityRange && item.quantity) {
         if (
           filter.quantityRange.min &&
@@ -375,7 +357,6 @@ export class CartUtils {
         }
       }
 
-      // Filtro customizado
       if (filter.customFilter && !filter.customFilter(item)) {
         return false;
       }
@@ -488,12 +469,10 @@ export class CartUtils {
    * ```
    */
   static areItemsEquivalent(itemA: SaleItem, itemB: SaleItem): boolean {
-    // Comparar produtos
     if (itemA.product?.id !== itemB.product?.id) {
       return false;
     }
 
-    // Comparar addons
     const addonsA = itemA.addons?.map((addon) => addon.id).sort() || [];
     const addonsB = itemB.addons?.map((addon) => addon.id).sort() || [];
 
@@ -507,7 +486,6 @@ export class CartUtils {
       }
     }
 
-    // Comparar opções selecionadas
     const optionsA = itemA.selectedOptions;
     const optionsB = itemB.selectedOptions;
 
@@ -519,7 +497,6 @@ export class CartUtils {
       return false;
     }
 
-    // Comparar cada tipo de opção
     const compareArrays = (arrA?: string[], arrB?: string[]) => {
       const a = (arrA || []).sort();
       const b = (arrB || []).sort();

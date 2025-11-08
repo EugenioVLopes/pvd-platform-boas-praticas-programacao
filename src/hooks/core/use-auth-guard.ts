@@ -76,12 +76,10 @@ export function useAuthGuard({
   const [isLoading, setIsLoading] = useState(showLoading);
   const [error, setError] = useState<string | null>(null);
 
-  // Função para limpar erros
   const clearError = useCallback(() => {
     setError(null);
   }, []);
 
-  // Função para definir erro com log consistente
   const handleError = useCallback(
     (errorMessage: string, originalError?: unknown) => {
       console.error(`[useAuthGuard] ${errorMessage}:`, originalError);

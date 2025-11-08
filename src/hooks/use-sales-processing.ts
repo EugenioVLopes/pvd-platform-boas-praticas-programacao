@@ -11,7 +11,6 @@ import type { Order, PaymentMethod } from "@/types/order";
 import type { Product, SaleItem } from "@/types/product";
 
 export function useSalesProcessing() {
-  // Hooks consolidados
   const { products } = useProducts();
   const {
     items: temporaryItems,
@@ -25,7 +24,6 @@ export function useSalesProcessing() {
   const { completeSale, loading: salesLoading, error: salesError } = useSales();
   const { state: uiState, actions: uiActions } = useSalesUI();
 
-  // Usar função de cálculo do useCart para consistência
   const calculateItemTotal = getItemTotal;
 
   const calculateOrderTotal = useMemo(
@@ -34,7 +32,6 @@ export function useSalesProcessing() {
     [calculateItemTotal]
   );
 
-  // Handlers de categoria usando o novo hook de UI
   const handleCategorySelect = useCallback(
     (category: string) => {
       uiActions.selectCategory(category);
@@ -42,7 +39,6 @@ export function useSalesProcessing() {
     [uiActions]
   );
 
-  // Handlers de produto usando o novo hook de UI
   const handleProductSelect = useCallback(
     (product: Product) => {
       if (product.type === "weight") {
@@ -58,7 +54,6 @@ export function useSalesProcessing() {
     [addItem, uiActions]
   );
 
-  // Handler de confirmação de peso usando o novo hook de UI
   const handleWeightConfirm = useCallback(
     (weight: number) => {
       if (uiState.selectedProduct) {
@@ -71,7 +66,6 @@ export function useSalesProcessing() {
     [uiState.selectedProduct, addItem, uiActions]
   );
 
-  // Handler de customização usando o novo hook de UI
   const handleCustomizeConfirm = useCallback(
     (
       selectedOptions: {
@@ -99,13 +93,12 @@ export function useSalesProcessing() {
     },
     [uiState.selectedProduct, addItem, uiActions]
   );
-  // Handler de pagamento usando o novo hook de vendas
+
   const handlePayment = useCallback(
     async (paymentMethod: PaymentMethod, cashAmount?: number) => {
       try {
         uiActions.setPaymentProcessing(true);
 
-        // Determinar o pedido a finalizar
         const currentOrder = uiState.currentOrderId
           ? orders.find((o) => o.id === uiState.currentOrderId)
           : null;
@@ -113,7 +106,6 @@ export function useSalesProcessing() {
         const customerName = currentOrder?.customerName || "Venda Direta";
         const itemsToFinalize = currentOrder?.items || temporaryItems;
 
-        // Preparar dados da venda
         const saleData: CompleteSaleData = {
           customerName,
           items: itemsToFinalize,
@@ -121,10 +113,8 @@ export function useSalesProcessing() {
           cashAmount,
         };
 
-        // Finalizar venda usando o novo hook
         await completeSale(saleData);
 
-        // Limpar estado após sucesso
         if (currentOrder) {
           removeOrder(currentOrder.id);
         }
@@ -133,7 +123,6 @@ export function useSalesProcessing() {
         uiActions.selectOrder(null);
         clearCart();
 
-        // Calcular total para exibição
         const total = itemsToFinalize.reduce(
           (sum, item) => sum + calculateItemTotal(item),
           0
@@ -169,7 +158,6 @@ export function useSalesProcessing() {
     ]
   );
 
-  // Criação de novo pedido usando o hook de UI
   const createNewOrder = useCallback(
     (customerName: string) => {
       const orderData = {
@@ -180,7 +168,6 @@ export function useSalesProcessing() {
 
       addOrder(orderData);
 
-      // Limpar seleção atual já que criamos um novo pedido
       uiActions.closeModal("isNewOrderModalOpen");
       uiActions.setNewOrderName("");
       clearCart();
@@ -188,7 +175,6 @@ export function useSalesProcessing() {
     [addOrder, temporaryItems, clearCart, uiActions]
   );
 
-  // Handler de seleção de ação usando o hook de UI
   const handleActionSelection = useCallback(
     (
       action: "add_to_order" | "finalize_sale" | "new_order",
@@ -211,7 +197,6 @@ export function useSalesProcessing() {
             title: "Produtos Adicionados",
             description: `${temporaryItems.length} produto(s) adicionado(s) à comanda de ${order.customerName}`,
           });
-          // Selecionar a comanda para visualização
           uiActions.selectOrder(orderIdOrName);
         } else {
           toast({
@@ -224,10 +209,8 @@ export function useSalesProcessing() {
         uiActions.openPaymentModal();
       }
 
-      // Limpar estado da UI
       uiActions.closeModal("isActionModalOpen");
       uiActions.setShowProducts(false);
-      // Não limpar a seleção se produtos foram adicionados a uma comanda
       if (action !== "add_to_order") {
         uiActions.selectOrder(null);
       }
@@ -243,7 +226,6 @@ export function useSalesProcessing() {
     ]
   );
 
-  // Handlers de atualização de itens do pedido
   const handleUpdateOrderItem = useCallback(
     (orderId: string, itemIndex: number, updatedItem: SaleItem) => {
       const order = orders.find((o) => o.id === orderId);
@@ -267,7 +249,6 @@ export function useSalesProcessing() {
     [orders, updateOrder]
   );
 
-  // Handler otimizado para atualizar item do carrinho
   const handleUpdateCartItem = useCallback(
     (index: number, item: SaleItem) => {
       removeItem(index);
@@ -281,7 +262,6 @@ export function useSalesProcessing() {
     [removeItem, addItem]
   );
 
-  // Obter pedido atual baseado no ID selecionado
   const currentOrder = useMemo(() => {
     return uiState.currentOrderId
       ? orders.find((o) => o.id === uiState.currentOrderId) || null
@@ -289,25 +269,16 @@ export function useSalesProcessing() {
   }, [uiState.currentOrderId, orders]);
 
   return {
-    // Estado consolidado
     uiState,
     uiActions,
     currentOrder,
-
-    // Dados
     products,
     temporaryItems,
     orders,
-
-    // Estados de loading/error
     salesLoading,
     salesError,
-
-    // Funções de cálculo
     calculateOrderTotal,
     calculateItemTotal,
-
-    // Handlers principais
     handleCategorySelect,
     handleProductSelect,
     handleWeightConfirm,
@@ -315,13 +286,9 @@ export function useSalesProcessing() {
     handlePayment,
     createNewOrder,
     handleActionSelection,
-
-    // Handlers de pedidos
     handleUpdateOrderItem,
     handleRemoveOrderItem,
     removeOrder,
-
-    // Handlers de carrinho
     handleRemoveFromCart: removeItem,
     handleUpdateCartItem,
   };

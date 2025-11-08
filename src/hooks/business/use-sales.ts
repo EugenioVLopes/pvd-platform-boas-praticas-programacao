@@ -34,20 +34,13 @@ export interface UseSalesOptions extends BaseHookOptions {
  * Interface de retorno do hook useSales
  */
 export interface UseSalesReturn {
-  // Estado atual
   completedSales: Order[];
-
-  // Ações principais
   completeSale: (saleData: CompleteSaleData) => Promise<void>;
   cancelSale: (saleId: string) => void;
   getSale: (saleId: string) => Order | undefined;
   clearSales: () => void;
-
-  // Estado assíncrono
   loading: boolean;
   error: string | null;
-
-  // Métricas calculadas
   totalSales: number;
   totalRevenue: number;
   averageTicket: number;
@@ -128,19 +121,14 @@ const useSalesStore = create<SalesStore>()(
 export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
   const { enabled = true } = options;
 
-  // Estado local para operações assíncronas
   const [asyncState, setAsyncState] = useState<AsyncHookState<null>>({
     data: null,
     loading: false,
     error: null,
   });
 
-  // Store Zustand para persistência
   const { sales, addSale, removeSale, clearSales } = useSalesStore();
 
-  /**
-   * Calcula o total de um item de venda
-   */
   const calculateItemTotal = useCallback((item: SaleItem): number => {
     let baseTotal = 0;
 
@@ -150,16 +138,12 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
       baseTotal = item.product.price * (item.quantity || 1);
     }
 
-    // Adicionar preço dos addons
     const addonsTotal =
       item.addons?.reduce((sum, addon) => sum + addon.price, 0) || 0;
 
     return baseTotal + addonsTotal;
   }, []);
 
-  /**
-   * Calcula o total de uma venda
-   */
   const calculateSaleTotal = useCallback(
     (items: SaleItem[]): number => {
       return items.reduce((sum, item) => sum + calculateItemTotal(item), 0);
@@ -167,9 +151,6 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
     [calculateItemTotal]
   );
 
-  /**
-   * Finaliza uma venda com tratamento de erro
-   */
   const completeSale = useCallback(
     async (saleData: CompleteSaleData): Promise<void> => {
       if (!enabled) return;
@@ -177,7 +158,6 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
       setAsyncState((prev) => ({ ...prev, loading: true, error: null }));
 
       try {
-        // Validações básicas
         if (!saleData.customerName.trim()) {
           throw new Error("Nome do cliente é obrigatório");
         }
@@ -186,19 +166,16 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
           throw new Error("Pelo menos um item deve ser adicionado à venda");
         }
 
-        // Calcular totais
         const total = calculateSaleTotal(saleData.items);
         const discount = saleData.discount || 0;
         const finalTotal = total - discount;
 
-        // Validar pagamento em dinheiro
         if (saleData.paymentMethod === "CASH" && saleData.cashAmount) {
           if (saleData.cashAmount < finalTotal) {
             throw new Error("Valor em dinheiro insuficiente");
           }
         }
 
-        // Criar ordem finalizada
         const completedOrder: Order = {
           id: crypto.randomUUID(),
           customerName: saleData.customerName,
@@ -212,10 +189,8 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
           change: saleData.cashAmount ? saleData.cashAmount - finalTotal : 0,
         };
 
-        // Simular operação assíncrona (ex: salvar no servidor)
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        // Adicionar à store
         addSale(completedOrder);
 
         setAsyncState((prev) => ({ ...prev, loading: false, data: null }));
@@ -235,9 +210,6 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
     [enabled, calculateSaleTotal, addSale]
   );
 
-  /**
-   * Cancela/remove uma venda
-   */
   const cancelSale = useCallback(
     (saleId: string): void => {
       if (!enabled) return;
@@ -254,9 +226,6 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
     [enabled, removeSale]
   );
 
-  /**
-   * Busca uma venda específica por ID
-   */
   const getSale = useCallback(
     (saleId: string): Order | undefined => {
       return sales.find((sale) => sale.id === saleId);
@@ -264,9 +233,6 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
     [sales]
   );
 
-  /**
-   * Limpa todas as vendas
-   */
   const handleClearSales = useCallback((): void => {
     if (!enabled) return;
 
@@ -280,7 +246,6 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
     }
   }, [enabled, clearSales]);
 
-  // Métricas calculadas
   const metrics = useMemo(() => {
     const totalSales = sales.length;
     const totalRevenue = sales.reduce(
@@ -297,18 +262,13 @@ export function useSales(options: UseSalesOptions = {}): UseSalesReturn {
   }, [sales]);
 
   return {
-    // Estado
     completedSales: sales,
     loading: asyncState.loading,
     error: asyncState.error,
-
-    // Ações
     completeSale,
     cancelSale,
     getSale,
     clearSales: handleClearSales,
-
-    // Métricas
     ...metrics,
   };
 }
