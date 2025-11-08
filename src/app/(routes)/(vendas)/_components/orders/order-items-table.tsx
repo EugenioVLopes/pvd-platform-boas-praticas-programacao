@@ -22,23 +22,23 @@ export function OrderItemsTable({
   onUpdateItem,
 }: OrderItemsTableProps) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-pink-200 shadow-sm">
+    <div className="overflow-x-auto rounded-lg border border-pink-200 bg-white shadow-md">
       <Table className="w-full min-w-[600px]">
         <TableHeader>
-          <TableRow className="bg-gray-50">
-            <TableHead className="px-4 py-3 text-xs font-semibold text-gray-700 md:text-sm">
+          <TableRow className="bg-gradient-to-r from-pink-50 to-purple-50 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50">
+            <TableHead className="px-4 py-4 text-xs font-bold uppercase tracking-wide text-gray-700 md:text-sm">
               Produto
             </TableHead>
-            <TableHead className="px-4 py-3 text-center text-xs font-semibold text-gray-700 md:text-sm">
+            <TableHead className="px-4 py-4 text-center text-xs font-bold uppercase tracking-wide text-gray-700 md:text-sm">
               Quantidade/Peso
             </TableHead>
-            <TableHead className="px-4 py-3 text-center text-xs font-semibold text-gray-700 md:text-sm">
-              Preço
+            <TableHead className="px-4 py-4 text-center text-xs font-bold uppercase tracking-wide text-gray-700 md:text-sm">
+              Preço Unitário
             </TableHead>
-            <TableHead className="px-4 py-3 text-center text-xs font-semibold text-gray-700 md:text-sm">
+            <TableHead className="px-4 py-4 text-center text-xs font-bold uppercase tracking-wide text-gray-700 md:text-sm">
               Subtotal
             </TableHead>
-            <TableHead className="px-4 py-3 text-center text-xs font-semibold text-gray-700 md:text-sm">
+            <TableHead className="px-4 py-4 text-center text-xs font-bold uppercase tracking-wide text-gray-700 md:text-sm">
               Ações
             </TableHead>
           </TableRow>
@@ -59,8 +59,16 @@ export function OrderItemsTable({
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="py-6 text-center text-gray-500">
-                Nenhum item no pedido
+              <TableCell
+                colSpan={5}
+                className="py-12 text-center text-gray-400"
+              >
+                <div className="flex flex-col items-center gap-2">
+                  <p className="text-base font-medium">Nenhum item no pedido</p>
+                  <p className="text-sm text-gray-400">
+                    Adicione produtos para começar
+                  </p>
+                </div>
               </TableCell>
             </TableRow>
           )}
