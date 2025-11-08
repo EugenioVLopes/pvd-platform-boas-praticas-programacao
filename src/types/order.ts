@@ -14,13 +14,13 @@ export interface Order {
   id: string;
   customerName: string;
   items: SaleItem[];
-  createdAt: Date;
-  updatedAt: Date;
   status: "open" | "completed";
   paymentMethod?: PaymentMethod;
   total?: number;
   finalizadaEm?: Date;
   change?: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface SalesReport {
