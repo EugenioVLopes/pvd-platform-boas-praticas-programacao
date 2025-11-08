@@ -59,52 +59,67 @@ export function WeightInputModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Inserir Peso para {productName}</DialogTitle>
+      <DialogContent className="sm:max-w-[450px]">
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            Inserir Peso para {productName}
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-6 py-4">
           {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+            <Alert variant="destructive" className="border-destructive">
+              <AlertDescription className="font-medium">
+                {error}
+              </AlertDescription>
             </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="weight-input">Peso em gramas</Label>
-            <Input
-              id="weight-input"
-              type="number"
-              placeholder="Digite o peso em gramas"
-              value={weight}
-              onChange={(e) => {
-                setWeight(e.target.value);
-                setError(null);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleConfirm();
-                }
-              }}
-              step="0.1"
-              min="0"
-              autoFocus
-              className={error ? "border-destructive" : ""}
-            />
+          <div className="space-y-3">
+            <Label htmlFor="weight-input" className="text-sm font-medium">
+              Peso em gramas
+            </Label>
+            <div className="relative">
+              <Input
+                id="weight-input"
+                type="number"
+                placeholder="Digite o peso em gramas"
+                value={weight}
+                onChange={(e) => {
+                  setWeight(e.target.value);
+                  setError(null);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleConfirm();
+                  }
+                }}
+                step="0.1"
+                min="0"
+                autoFocus
+                className={`h-12 text-lg font-medium ${
+                  error ? "border-destructive focus-visible:ring-destructive" : ""
+                }`}
+              />
+              {weight && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  g
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Keypad numérico */}
-          <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-muted-foreground">
               Ou use o teclado numérico:
             </Label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-3 gap-2.5">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                 <Button
                   key={num}
                   variant="outline"
-                  className="h-12 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                  className="h-14 text-lg font-semibold transition-all hover:scale-105 hover:bg-primary hover:text-primary-foreground active:scale-95"
                   onClick={() => appendDigit(num.toString())}
                   type="button"
                 >
@@ -113,7 +128,7 @@ export function WeightInputModal({
               ))}
               <Button
                 variant="outline"
-                className="h-12 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                className="h-14 text-lg font-semibold transition-all hover:scale-105 hover:bg-primary hover:text-primary-foreground active:scale-95"
                 onClick={() => appendDigit("0")}
                 type="button"
               >
@@ -121,7 +136,7 @@ export function WeightInputModal({
               </Button>
               <Button
                 variant="outline"
-                className="h-12 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                className="h-14 text-lg font-semibold transition-all hover:scale-105 hover:bg-primary hover:text-primary-foreground active:scale-95"
                 onClick={() => appendDigit(".")}
                 type="button"
               >
@@ -129,7 +144,7 @@ export function WeightInputModal({
               </Button>
               <Button
                 variant="outline"
-                className="h-12 hover:bg-destructive hover:text-destructive-foreground"
+                className="h-14 text-lg font-semibold transition-all hover:scale-105 hover:bg-destructive hover:text-destructive-foreground active:scale-95"
                 onClick={deleteDigit}
                 type="button"
               >
@@ -138,13 +153,15 @@ export function WeightInputModal({
             </div>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+        <DialogFooter className="border-t pt-4">
+          <Button variant="outline" onClick={handleClose} type="button">
             Cancelar
           </Button>
           <Button
             onClick={handleConfirm}
             disabled={!weight || Number.parseFloat(weight) <= 0}
+            type="button"
+            className="min-w-[120px]"
           >
             Confirmar
           </Button>

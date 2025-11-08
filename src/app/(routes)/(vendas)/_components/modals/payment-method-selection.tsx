@@ -15,6 +15,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -175,15 +176,19 @@ export function PaymentMethodSelection({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Selecionar Método de Pagamento</DialogTitle>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            Selecionar Método de Pagamento
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-6 py-4">
           {error && (
-            <Alert variant="destructive">
-              <AlertTitle>Erro ao Processar Pagamento</AlertTitle>
-              <AlertDescription>{error}</AlertDescription>
+            <Alert variant="destructive" className="border-destructive">
+              <AlertTitle className="font-semibold">
+                Erro ao Processar Pagamento
+              </AlertTitle>
+              <AlertDescription className="mt-1">{error}</AlertDescription>
             </Alert>
           )}
 
@@ -191,56 +196,74 @@ export function PaymentMethodSelection({
             {PAYMENT_METHODS.map((method) => (
               <Card
                 key={method.type}
-                className={`cursor-pointer transition-all hover:border-primary hover:shadow-md ${
+                className={`cursor-pointer transition-all hover:border-primary hover:shadow-lg ${
                   selectedMethod === method.type
-                    ? "border-primary bg-primary text-primary-foreground shadow-md"
+                    ? "scale-105 border-2 border-primary bg-primary text-primary-foreground shadow-lg"
                     : "border-border"
                 }`}
                 onClick={() => handleMethodSelect(method.type)}
               >
                 <CardContent className="flex flex-col items-center justify-center p-6">
-                  <div className="mb-2">{method.icon}</div>
-                  <span className="text-sm font-medium">{method.label}</span>
+                  <div
+                    className={`mb-3 transition-transform ${
+                      selectedMethod === method.type ? "scale-110" : ""
+                    }`}
+                  >
+                    {method.icon}
+                  </div>
+                  <span className="text-sm font-semibold">{method.label}</span>
                 </CardContent>
               </Card>
             ))}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="adjustedTotal">Valor final da venda</Label>
-            <Input
-              id="adjustedTotal"
-              type="number"
-              value={adjustedTotal}
-              onChange={(e) => {
-                const newValue = e.target.value;
-                setAdjustedTotal(newValue);
-                validateAdjustedTotal(newValue);
-              }}
-              step="0.01"
-              min={initialTotal * 0.9} // Limita o input para no máximo 10% de desconto
-              max={initialTotal}
-              className={error ? "border-destructive" : ""}
-            />
-            {Number(adjustedTotal) < initialTotal && (
-              <p className="text-sm text-muted-foreground">
-                Desconto aplicado:{" "}
-                <span className="font-medium text-primary">
-                  {formatCurrency(initialTotal - Number(adjustedTotal))}
-                </span>{" "}
-                (
-                {(
-                  ((initialTotal - Number(adjustedTotal)) / initialTotal) *
-                  100
-                ).toFixed(1)}
-                %)
-              </p>
-            )}
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+            <div className="space-y-2">
+              <Label htmlFor="adjustedTotal" className="text-sm font-medium">
+                Valor final da venda
+              </Label>
+              <Input
+                id="adjustedTotal"
+                type="number"
+                value={adjustedTotal}
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  setAdjustedTotal(newValue);
+                  validateAdjustedTotal(newValue);
+                }}
+                step="0.01"
+                min={initialTotal * 0.9}
+                max={initialTotal}
+                className={`h-11 text-base font-semibold ${
+                  error
+                    ? "border-destructive focus-visible:ring-destructive"
+                    : ""
+                }`}
+              />
+              {Number(adjustedTotal) < initialTotal && (
+                <div className="mt-2 flex items-center gap-2 rounded-md bg-primary/10 px-3 py-2">
+                  <p className="text-sm font-medium text-primary">
+                    Desconto aplicado:{" "}
+                    <span className="font-bold">
+                      {formatCurrency(initialTotal - Number(adjustedTotal))}
+                    </span>{" "}
+                    (
+                    {(
+                      ((initialTotal - Number(adjustedTotal)) / initialTotal) *
+                      100
+                    ).toFixed(1)}
+                    %)
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {selectedMethod === "CASH" && (
-            <div className="space-y-2">
-              <Label htmlFor="cashAmount">Valor recebido em dinheiro</Label>
+            <div className="space-y-3">
+              <Label htmlFor="cashAmount" className="text-sm font-medium">
+                Valor recebido em dinheiro
+              </Label>
               <Input
                 id="cashAmount"
                 type="number"
@@ -249,29 +272,33 @@ export function PaymentMethodSelection({
                 placeholder={`Valor mínimo: ${formatCurrency(Number(adjustedTotal))}`}
                 min={Number(adjustedTotal)}
                 step="0.01"
-                className={error ? "border-destructive" : ""}
+                className={`h-11 text-base font-semibold ${
+                  error
+                    ? "border-destructive focus-visible:ring-destructive"
+                    : ""
+                }`}
               />
               {isValidCashAmount && cashAmount && (
-                <div className="space-y-1 rounded-md bg-muted p-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
+                <div className="space-y-2 rounded-lg border-2 border-primary/20 bg-primary/5 p-4 shadow-sm">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium text-muted-foreground">
                       Valor total da compra:
                     </span>
-                    <span className="font-medium">
+                    <span className="font-semibold">
                       {formatCurrency(Number(adjustedTotal))}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
+                  <div className="flex justify-between text-sm">
+                    <span className="font-medium text-muted-foreground">
                       Valor recebido:
                     </span>
-                    <span className="font-medium">
+                    <span className="font-semibold">
                       {formatCurrency(Number(cashAmount))}
                     </span>
                   </div>
-                  <div className="flex justify-between border-t pt-1">
-                    <span className="font-semibold">Troco:</span>
-                    <span className="font-semibold text-primary">
+                  <div className="flex justify-between border-t border-primary/20 pt-2">
+                    <span className="text-base font-bold">Troco:</span>
+                    <span className="text-lg font-bold text-primary">
                       {formatCurrency(calculaTroco())}
                     </span>
                   </div>
@@ -279,22 +306,23 @@ export function PaymentMethodSelection({
               )}
             </div>
           )}
-
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={handleClose}>
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleConfirm}
-              disabled={
-                !selectedMethod ||
-                (selectedMethod === "CASH" && !isValidCashAmount)
-              }
-            >
-              Confirmar
-            </Button>
-          </div>
         </div>
+        <DialogFooter className="border-t pt-4">
+          <Button variant="outline" onClick={handleClose} type="button">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={
+              !selectedMethod ||
+              (selectedMethod === "CASH" && !isValidCashAmount)
+            }
+            type="button"
+            className="min-w-[120px]"
+          >
+            Confirmar
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

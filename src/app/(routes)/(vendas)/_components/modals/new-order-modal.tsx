@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -49,19 +50,25 @@ export function NewOrderModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Nova Comanda</DialogTitle>
+      <DialogContent className="sm:max-w-[450px]">
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            Nova Comanda
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-6 py-4">
           {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+            <Alert variant="destructive" className="border-destructive">
+              <AlertDescription className="font-medium">
+                {error}
+              </AlertDescription>
             </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="customerName">Nome do Cliente</Label>
+          <div className="space-y-3">
+            <Label htmlFor="customerName" className="text-sm font-medium">
+              Nome do Cliente
+            </Label>
             <Input
               id="customerName"
               placeholder="Digite o nome do cliente"
@@ -76,19 +83,25 @@ export function NewOrderModal({
                 }
               }}
               autoFocus
-              className={error ? "border-destructive" : ""}
+              className={`h-11 text-base ${
+                error ? "border-destructive focus-visible:ring-destructive" : ""
+              }`}
             />
           </div>
-
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={handleClose}>
-              Cancelar
-            </Button>
-            <Button onClick={handleConfirm} disabled={!customerName.trim()}>
-              Criar Comanda
-            </Button>
-          </div>
         </div>
+        <DialogFooter className="border-t pt-4">
+          <Button variant="outline" onClick={handleClose} type="button">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleConfirm}
+            disabled={!customerName.trim()}
+            type="button"
+            className="min-w-[140px]"
+          >
+            Criar Comanda
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

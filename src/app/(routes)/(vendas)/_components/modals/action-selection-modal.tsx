@@ -9,6 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -78,23 +79,27 @@ export function ActionSelectionModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Escolha uma ação</DialogTitle>
+      <DialogContent className="sm:max-w-[550px]">
+        <DialogHeader className="border-b pb-4">
+          <DialogTitle className="text-xl font-semibold">
+            Escolha uma ação
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-6 py-4">
           {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
+            <Alert variant="destructive" className="border-destructive">
+              <AlertDescription className="font-medium">
+                {error}
+              </AlertDescription>
             </Alert>
           )}
 
           <div className="grid grid-cols-2 gap-3">
             {orders.length > 0 && (
               <Card
-                className={`cursor-pointer transition-all hover:border-primary hover:shadow-md ${
+                className={`cursor-pointer transition-all hover:border-primary hover:shadow-lg ${
                   selectedAction === "add_to_order"
-                    ? "border-primary bg-primary text-primary-foreground shadow-md"
+                    ? "scale-105 border-2 border-primary bg-primary text-primary-foreground shadow-lg"
                     : "border-border"
                 }`}
                 onClick={() => {
@@ -103,19 +108,23 @@ export function ActionSelectionModal({
                 }}
               >
                 <CardContent className="flex flex-col items-center justify-center p-6">
-                  <ShoppingCart className="mb-2 h-8 w-8" />
-                  <span className="text-sm font-medium">
+                  <ShoppingCart
+                    className={`mb-3 h-10 w-10 transition-transform ${
+                      selectedAction === "add_to_order" ? "scale-110" : ""
+                    }`}
+                  />
+                  <span className="text-sm font-semibold">
                     Adicionar à Comanda
                   </span>
                 </CardContent>
               </Card>
             )}
             <Card
-              className={`cursor-pointer transition-all hover:border-primary hover:shadow-md ${
+              className={`cursor-pointer transition-all hover:border-primary hover:shadow-lg ${
                 orders.length === 0 ? "col-span-2" : ""
               } ${
                 selectedAction === "finalize_sale"
-                  ? "border-primary bg-primary text-primary-foreground shadow-md"
+                  ? "scale-105 border-2 border-primary bg-primary text-primary-foreground shadow-lg"
                   : "border-border"
               }`}
               onClick={() => {
@@ -124,14 +133,18 @@ export function ActionSelectionModal({
               }}
             >
               <CardContent className="flex flex-col items-center justify-center p-6">
-                <CreditCard className="mb-2 h-8 w-8" />
-                <span className="text-sm font-medium">Finalizar Venda</span>
+                <CreditCard
+                  className={`mb-3 h-10 w-10 transition-transform ${
+                    selectedAction === "finalize_sale" ? "scale-110" : ""
+                  }`}
+                />
+                <span className="text-sm font-semibold">Finalizar Venda</span>
               </CardContent>
             </Card>
             <Card
-              className={`col-span-2 cursor-pointer transition-all hover:border-primary hover:shadow-md ${
+              className={`col-span-2 cursor-pointer transition-all hover:border-primary hover:shadow-lg ${
                 selectedAction === "new_order"
-                  ? "border-primary bg-primary text-primary-foreground shadow-md"
+                  ? "scale-105 border-2 border-primary bg-primary text-primary-foreground shadow-lg"
                   : "border-border"
               }`}
               onClick={() => {
@@ -140,15 +153,21 @@ export function ActionSelectionModal({
               }}
             >
               <CardContent className="flex flex-col items-center justify-center p-6">
-                <Plus className="mb-2 h-8 w-8" />
-                <span className="text-sm font-medium">Nova Comanda</span>
+                <Plus
+                  className={`mb-3 h-10 w-10 transition-transform ${
+                    selectedAction === "new_order" ? "scale-110" : ""
+                  }`}
+                />
+                <span className="text-sm font-semibold">Nova Comanda</span>
               </CardContent>
             </Card>
           </div>
 
           {selectedAction === "add_to_order" && orders.length > 0 && (
-            <div className="space-y-2">
-              <Label htmlFor="order-select">Selecione uma comanda</Label>
+            <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+              <Label htmlFor="order-select" className="text-sm font-medium">
+                Selecione uma comanda
+              </Label>
               <Select
                 value={selectedOrderId}
                 onValueChange={(value) => {
@@ -156,7 +175,7 @@ export function ActionSelectionModal({
                   setError(null);
                 }}
               >
-                <SelectTrigger id="order-select">
+                <SelectTrigger id="order-select" className="h-11">
                   <SelectValue placeholder="Selecione uma comanda" />
                 </SelectTrigger>
                 <SelectContent>
@@ -171,8 +190,10 @@ export function ActionSelectionModal({
           )}
 
           {selectedAction === "new_order" && (
-            <div className="space-y-2">
-              <Label htmlFor="customer-name">Nome do cliente</Label>
+            <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+              <Label htmlFor="customer-name" className="text-sm font-medium">
+                Nome do cliente
+              </Label>
               <Input
                 id="customer-name"
                 placeholder="Digite o nome do cliente"
@@ -187,18 +208,24 @@ export function ActionSelectionModal({
                   }
                 }}
                 autoFocus
+                className="h-11"
               />
             </div>
           )}
 
-          <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={handleClose}>
+          <DialogFooter className="border-t pt-4">
+            <Button variant="outline" onClick={handleClose} type="button">
               Cancelar
             </Button>
-            <Button onClick={handleConfirm} disabled={!selectedAction}>
+            <Button
+              onClick={handleConfirm}
+              disabled={!selectedAction}
+              type="button"
+              className="min-w-[120px]"
+            >
               Confirmar
             </Button>
-          </div>
+          </DialogFooter>
         </div>
       </DialogContent>
     </Dialog>

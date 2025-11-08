@@ -78,7 +78,7 @@ export function OrderItemRow({ item, onRemove, onUpdate }: OrderItemRowProps) {
                     variant="outline"
                     className="flex flex-col gap-1 rounded-lg border-blue-300 bg-gradient-to-r from-blue-50 to-blue-100/50 px-3 py-1.5 text-xs font-medium shadow-sm md:flex-row md:items-center"
                   >
-                    <span className="font-bold text-blue-700">🥛 Cremes:</span>
+                    <span className="font-bold text-blue-700">Cremes:</span>
                     <span className="text-blue-800">
                       {item.selectedOptions.cremes.join(", ")}
                     </span>
