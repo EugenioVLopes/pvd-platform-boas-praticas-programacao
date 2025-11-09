@@ -2,8 +2,8 @@
 
 import { useCallback, useState } from "react";
 
-import type { BaseHookOptions } from "@/types";
 import type { Product } from "@/features/products";
+import type { BaseHookOptions } from "@/types";
 
 /**
  * Estado completo da interface de vendas
@@ -239,6 +239,44 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     [updateState]
   );
 
+  const getModalResetUpdates = useCallback(
+    (
+      modalName: keyof Pick<
+        SalesUIState,
+        | "isWeightModalOpen"
+        | "isPaymentModalOpen"
+        | "isCustomizeModalOpen"
+        | "isNewOrderModalOpen"
+        | "isActionModalOpen"
+        | "isProductDetailsOpen"
+        | "isCategoryOpen"
+      >
+    ): Partial<SalesUIState> => {
+      const resetMap: Record<string, Partial<SalesUIState>> = {
+        isWeightModalOpen: {
+          selectedProduct: null,
+          currentProduct: null,
+        },
+        isCustomizeModalOpen: {
+          selectedProduct: null,
+          currentProduct: null,
+        },
+        isNewOrderModalOpen: {
+          newOrderName: "",
+        },
+        isProductDetailsOpen: {
+          currentProduct: null,
+        },
+        isCategoryOpen: {
+          currentCategory: null,
+        },
+      };
+
+      return resetMap[modalName] || {};
+    },
+    []
+  );
+
   const closeModal = useCallback(
     (
       modalName: keyof Pick<
@@ -257,27 +295,12 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
       };
 
       if (autoReset) {
-        switch (modalName) {
-          case "isWeightModalOpen":
-          case "isCustomizeModalOpen":
-            updates.selectedProduct = null;
-            updates.currentProduct = null;
-            break;
-          case "isNewOrderModalOpen":
-            updates.newOrderName = "";
-            break;
-          case "isProductDetailsOpen":
-            updates.currentProduct = null;
-            break;
-          case "isCategoryOpen":
-            updates.currentCategory = null;
-            break;
-        }
+        Object.assign(updates, getModalResetUpdates(modalName));
       }
 
       updateState(updates);
     },
-    [updateState, autoReset]
+    [updateState, autoReset, getModalResetUpdates]
   );
 
   const closeAllModals = useCallback(() => {
@@ -378,6 +401,36 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     [updateState]
   );
 
+  const getCurrentModal = useCallback((): string | null => {
+    const modalStateMap: Record<
+      keyof Pick<
+        SalesUIState,
+        | "isWeightModalOpen"
+        | "isPaymentModalOpen"
+        | "isCustomizeModalOpen"
+        | "isNewOrderModalOpen"
+        | "isActionModalOpen"
+        | "isProductDetailsOpen"
+        | "isCategoryOpen"
+      >,
+      string
+    > = {
+      isWeightModalOpen: "weight",
+      isPaymentModalOpen: "payment",
+      isCustomizeModalOpen: "customize",
+      isNewOrderModalOpen: "newOrder",
+      isActionModalOpen: "action",
+      isProductDetailsOpen: "productDetails",
+      isCategoryOpen: "category",
+    };
+
+    const modalKey = Object.keys(modalStateMap).find(
+      (key) => state[key as keyof SalesUIState]
+    ) as keyof typeof modalStateMap | undefined;
+
+    return modalKey ? modalStateMap[modalKey] : null;
+  }, [state]);
+
   const hasOpenModal = !!(
     state.isWeightModalOpen ||
     state.isPaymentModalOpen ||
@@ -388,23 +441,7 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     state.isCategoryOpen
   );
 
-  const currentModal = hasOpenModal
-    ? state.isWeightModalOpen
-      ? "weight"
-      : state.isPaymentModalOpen
-        ? "payment"
-        : state.isCustomizeModalOpen
-          ? "customize"
-          : state.isNewOrderModalOpen
-            ? "newOrder"
-            : state.isActionModalOpen
-              ? "action"
-              : state.isProductDetailsOpen
-                ? "productDetails"
-                : state.isCategoryOpen
-                  ? "category"
-                  : null
-    : null;
+  const currentModal = getCurrentModal();
 
   const canShowProducts = !hasOpenModal && !!state.selectedCategory;
 

@@ -1,4 +1,4 @@
-import type { SaleItem } from "@/features/products";
+import type { Product, SaleItem } from "@/features/products";
 import type {
   CartError,
   CartItemFilter,
@@ -28,6 +28,137 @@ export class CartUtils {
     };
   }
 
+  private static validateProduct(item: SaleItem): CartError | null {
+    if (!item.product || !item.product.id) {
+      return this.createError(
+        CartErrorType.INVALID_PRODUCT,
+        "Item deve ter um produto válido"
+      );
+    }
+    return null;
+  }
+
+  private static validateWeight(
+    item: SaleItem,
+    config: CartValidationConfig
+  ): CartError[] {
+    const errors: CartError[] = [];
+
+    if (
+      config.requireWeightForWeightProducts === false ||
+      item.product?.type !== "weight"
+    ) {
+      return errors;
+    }
+
+    if (!item.weight || item.weight <= 0) {
+      errors.push(
+        this.createError(
+          CartErrorType.WEIGHT_REQUIRED,
+          "Peso é obrigatório para produtos vendidos por peso",
+          {
+            productId: item.product.id,
+            currentValue: item.weight,
+            expectedValue: "> 0",
+          }
+        )
+      );
+      return errors;
+    }
+
+    const minWeight =
+      config.minimumWeight || CART_VALIDATION_CONSTANTS.MIN_WEIGHT;
+    const maxWeight =
+      config.maximumWeight || CART_VALIDATION_CONSTANTS.MAX_WEIGHT;
+
+    if (item.weight < minWeight) {
+      errors.push(
+        this.createError(
+          CartErrorType.VALIDATION_ERROR,
+          `Peso mínimo é ${minWeight}g`,
+          {
+            productId: item.product.id,
+            currentValue: item.weight,
+            expectedValue: `>= ${minWeight}`,
+          }
+        )
+      );
+    }
+
+    if (item.weight > maxWeight) {
+      errors.push(
+        this.createError(
+          CartErrorType.VALIDATION_ERROR,
+          `Peso máximo é ${maxWeight}g`,
+          {
+            productId: item.product.id,
+            currentValue: item.weight,
+            expectedValue: `<= ${maxWeight}`,
+          }
+        )
+      );
+    }
+
+    return errors;
+  }
+
+  private static validateQuantity(
+    item: SaleItem,
+    config: CartValidationConfig
+  ): CartError[] {
+    const errors: CartError[] = [];
+
+    if (item.quantity === undefined) {
+      return errors;
+    }
+
+    const minQuantity =
+      config.minimumQuantity || CART_VALIDATION_CONSTANTS.MIN_QUANTITY;
+
+    if (item.quantity < minQuantity) {
+      errors.push(
+        this.createError(
+          CartErrorType.INVALID_QUANTITY,
+          `Quantidade mínima é ${minQuantity}`,
+          {
+            productId: item.product?.id,
+            currentValue: item.quantity,
+            expectedValue: `>= ${minQuantity}`,
+          }
+        )
+      );
+    }
+
+    if (item.quantity > CART_VALIDATION_CONSTANTS.MAX_QUANTITY) {
+      errors.push(
+        this.createError(
+          CartErrorType.INVALID_QUANTITY,
+          `Quantidade máxima é ${CART_VALIDATION_CONSTANTS.MAX_QUANTITY}`,
+          {
+            productId: item.product?.id,
+            currentValue: item.quantity,
+            expectedValue: `<= ${CART_VALIDATION_CONSTANTS.MAX_QUANTITY}`,
+          }
+        )
+      );
+    }
+
+    return errors;
+  }
+
+  private static validateCustomValidators(
+    item: SaleItem,
+    config: CartValidationConfig
+  ): CartError[] {
+    if (!config.customValidators) {
+      return [];
+    }
+
+    return config.customValidators
+      .map((validator) => validator(item))
+      .filter((error): error is CartError => error !== null);
+  }
+
   static validateSingleItem(
     item: SaleItem,
     config: CartValidationConfig = {}
@@ -35,108 +166,14 @@ export class CartUtils {
     const errors: CartError[] = [];
     const warnings: string[] = [];
 
-    if (!item.product || !item.product.id) {
-      errors.push(
-        this.createError(
-          CartErrorType.INVALID_PRODUCT,
-          "Item deve ter um produto válido"
-        )
-      );
+    const productError = this.validateProduct(item);
+    if (productError) {
+      errors.push(productError);
     }
 
-    if (
-      config.requireWeightForWeightProducts !== false &&
-      item.product?.type === "weight"
-    ) {
-      if (!item.weight || item.weight <= 0) {
-        errors.push(
-          this.createError(
-            CartErrorType.WEIGHT_REQUIRED,
-            "Peso é obrigatório para produtos vendidos por peso",
-            {
-              productId: item.product.id,
-              currentValue: item.weight,
-              expectedValue: "> 0",
-            }
-          )
-        );
-      } else {
-        const minWeight =
-          config.minimumWeight || CART_VALIDATION_CONSTANTS.MIN_WEIGHT;
-        const maxWeight =
-          config.maximumWeight || CART_VALIDATION_CONSTANTS.MAX_WEIGHT;
-
-        if (item.weight < minWeight) {
-          errors.push(
-            this.createError(
-              CartErrorType.VALIDATION_ERROR,
-              `Peso mínimo é ${minWeight}g`,
-              {
-                productId: item.product.id,
-                currentValue: item.weight,
-                expectedValue: `>= ${minWeight}`,
-              }
-            )
-          );
-        }
-
-        if (item.weight > maxWeight) {
-          errors.push(
-            this.createError(
-              CartErrorType.VALIDATION_ERROR,
-              `Peso máximo é ${maxWeight}g`,
-              {
-                productId: item.product.id,
-                currentValue: item.weight,
-                expectedValue: `<= ${maxWeight}`,
-              }
-            )
-          );
-        }
-      }
-    }
-
-    if (item.quantity !== undefined) {
-      const minQuantity =
-        config.minimumQuantity || CART_VALIDATION_CONSTANTS.MIN_QUANTITY;
-
-      if (item.quantity < minQuantity) {
-        errors.push(
-          this.createError(
-            CartErrorType.INVALID_QUANTITY,
-            `Quantidade mínima é ${minQuantity}`,
-            {
-              productId: item.product?.id,
-              currentValue: item.quantity,
-              expectedValue: `>= ${minQuantity}`,
-            }
-          )
-        );
-      }
-
-      if (item.quantity > CART_VALIDATION_CONSTANTS.MAX_QUANTITY) {
-        errors.push(
-          this.createError(
-            CartErrorType.INVALID_QUANTITY,
-            `Quantidade máxima é ${CART_VALIDATION_CONSTANTS.MAX_QUANTITY}`,
-            {
-              productId: item.product?.id,
-              currentValue: item.quantity,
-              expectedValue: `<= ${CART_VALIDATION_CONSTANTS.MAX_QUANTITY}`,
-            }
-          )
-        );
-      }
-    }
-
-    if (config.customValidators) {
-      for (const validator of config.customValidators) {
-        const customError = validator(item);
-        if (customError) {
-          errors.push(customError);
-        }
-      }
-    }
+    errors.push(...this.validateWeight(item, config));
+    errors.push(...this.validateQuantity(item, config));
+    errors.push(...this.validateCustomValidators(item, config));
 
     if (item.product?.price === 0) {
       warnings.push("Produto com preço zero");
@@ -233,48 +270,96 @@ export class CartUtils {
     return total;
   }
 
+  private static matchesCategory(item: SaleItem, category?: string): boolean {
+    return !category || item.product?.category === category;
+  }
+
+  private static matchesProductType(
+    item: SaleItem,
+    productType?: Product["type"]
+  ): boolean {
+    return !productType || item.product?.type === productType;
+  }
+
+  private static matchesPriceRange(
+    item: SaleItem,
+    priceRange?: CartItemFilter["priceRange"]
+  ): boolean {
+    if (!priceRange) {
+      return true;
+    }
+
+    const itemTotal = this.calculateItemTotal(item);
+
+    if (priceRange.min && itemTotal < priceRange.min) {
+      return false;
+    }
+
+    if (priceRange.max && itemTotal > priceRange.max) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private static matchesWeightRange(
+    item: SaleItem,
+    weightRange?: CartItemFilter["weightRange"]
+  ): boolean {
+    if (!weightRange || !item.weight) {
+      return true;
+    }
+
+    if (weightRange.min && item.weight < weightRange.min) {
+      return false;
+    }
+
+    if (weightRange.max && item.weight > weightRange.max) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private static matchesQuantityRange(
+    item: SaleItem,
+    quantityRange?: CartItemFilter["quantityRange"]
+  ): boolean {
+    if (!quantityRange || !item.quantity) {
+      return true;
+    }
+
+    if (quantityRange.min && item.quantity < quantityRange.min) {
+      return false;
+    }
+
+    if (quantityRange.max && item.quantity > quantityRange.max) {
+      return false;
+    }
+
+    return true;
+  }
+
   static filterItems(items: SaleItem[], filter: CartItemFilter): SaleItem[] {
     return items.filter((item) => {
-      if (filter.category && item.product?.category !== filter.category) {
+      if (!this.matchesCategory(item, filter.category)) {
         return false;
       }
 
-      if (filter.productType && item.product?.type !== filter.productType) {
+      if (!this.matchesProductType(item, filter.productType)) {
         return false;
       }
 
-      if (filter.priceRange) {
-        const itemTotal = this.calculateItemTotal(item);
-        if (filter.priceRange.min && itemTotal < filter.priceRange.min) {
-          return false;
-        }
-        if (filter.priceRange.max && itemTotal > filter.priceRange.max) {
-          return false;
-        }
+      if (!this.matchesPriceRange(item, filter.priceRange)) {
+        return false;
       }
 
-      if (filter.weightRange && item.weight) {
-        if (filter.weightRange.min && item.weight < filter.weightRange.min) {
-          return false;
-        }
-        if (filter.weightRange.max && item.weight > filter.weightRange.max) {
-          return false;
-        }
+      if (!this.matchesWeightRange(item, filter.weightRange)) {
+        return false;
       }
 
-      if (filter.quantityRange && item.quantity) {
-        if (
-          filter.quantityRange.min &&
-          item.quantity < filter.quantityRange.min
-        ) {
-          return false;
-        }
-        if (
-          filter.quantityRange.max &&
-          item.quantity > filter.quantityRange.max
-        ) {
-          return false;
-        }
+      if (!this.matchesQuantityRange(item, filter.quantityRange)) {
+        return false;
       }
 
       if (filter.customFilter && !filter.customFilter(item)) {
@@ -349,8 +434,14 @@ export class CartUtils {
       return false;
     }
 
-    const addonsA = itemA.addons?.map((addon) => addon.id).sort() || [];
-    const addonsB = itemB.addons?.map((addon) => addon.id).sort() || [];
+    const addonsA =
+      itemA.addons
+        ?.map((addon) => String(addon.id))
+        .sort((a, b) => a.localeCompare(b, "pt-BR")) || [];
+    const addonsB =
+      itemB.addons
+        ?.map((addon) => String(addon.id))
+        .sort((a, b) => a.localeCompare(b, "pt-BR")) || [];
 
     if (addonsA.length !== addonsB.length) {
       return false;
@@ -374,8 +465,8 @@ export class CartUtils {
     }
 
     const compareArrays = (arrA?: string[], arrB?: string[]) => {
-      const a = (arrA || []).sort((x, y) => x.localeCompare(y));
-      const b = (arrB || []).sort((x, y) => x.localeCompare(y));
+      const a = (arrA || []).sort((x, y) => x.localeCompare(y, "pt-BR"));
+      const b = (arrB || []).sort((x, y) => x.localeCompare(y, "pt-BR"));
       return a.length === b.length && a.every((val, i) => val === b[i]);
     };
 
