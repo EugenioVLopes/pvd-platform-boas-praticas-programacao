@@ -1,5 +1,5 @@
-import { Order } from "@/types/order";
-import { SaleItem } from "@/types/product";
+import { Order } from "@/features/sales";
+import { SaleItem } from "@/features/products";
 
 /**
  * ✅ EXTRACT METHOD: Gera o HTML para impressão de um item do pedido

@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useProducts } from "@/hooks/business/use-products";
+import { useProducts } from "@/features/products";
 
 /**
  * CODE SMELL: Large Component

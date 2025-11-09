@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatCurrency } from "@/lib/utils";
-import type { PaymentMethod } from "@/types/order";
+import { formatCurrency } from "@/lib";
+import type { PaymentMethod } from "@/features/sales";
 
 interface PaymentMethodSelectionProps {
   isOpen: boolean;
@@ -63,7 +63,6 @@ export function PaymentMethodSelection({
   const [error, setError] = useState<string | null>(null);
   const [adjustedTotal, setAdjustedTotal] = useState<string>("");
 
-  // Atualiza o valor inicial do adjustedTotal quando o modal é aberto
   useEffect(() => {
     if (isOpen) {
       setAdjustedTotal(initialTotal.toFixed(2));
@@ -160,15 +159,13 @@ export function PaymentMethodSelection({
         Number(cashAmount) >= Number(adjustedTotal)
       : true;
 
-  // Função para limpar os campos
   const resetFields = () => {
     setSelectedMethod(null);
     setCashAmount("");
     setError(null);
-    setAdjustedTotal(initialTotal.toFixed(2)); // Reseta para o valor total inicial
+    setAdjustedTotal(initialTotal.toFixed(2));
   };
 
-  // Resetar estado ao fechar o modal
   const handleClose = () => {
     resetFields();
     onClose();

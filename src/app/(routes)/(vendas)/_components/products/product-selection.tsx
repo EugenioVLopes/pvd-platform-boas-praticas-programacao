@@ -1,5 +1,5 @@
-import { PRODUCT_CATEGORIES, ProductCategory } from "@/lib/constants/products";
-import { Product } from "@/types/product";
+import { PRODUCT_CATEGORIES, ProductCategory } from "@/lib/constants";
+import { Product } from "@/features/products";
 
 import { ProductCategories } from "./product-categories";
 import { ProductList } from "./product-list";

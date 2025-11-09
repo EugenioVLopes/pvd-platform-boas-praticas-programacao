@@ -2,8 +2,8 @@ import { Printer, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import { Order } from "@/types/order";
-import { SaleItem } from "@/types/product";
+import { Order } from "@/features/sales";
+import { SaleItem } from "@/features/products";
 
 // import { OrderItemsTable } from "./order-items-table"; // Comentado para documentação
 
@@ -91,7 +91,7 @@ export function OrderSection({
   };
 
   return (
-    <div className="bg-card rounded-lg p-4 shadow-sm">
+    <div className="rounded-lg bg-card p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-xl font-semibold">
           Comanda de {order.customerName}

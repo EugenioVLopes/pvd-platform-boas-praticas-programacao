@@ -1,7 +1,7 @@
 "use client";
 
-import { useProducts } from "@/hooks/business/use-products";
-import { Product } from "@/types/product";
+import { useProducts } from "@/features/products";
+import { Product } from "@/features/products";
 
 import { AddProductForm } from "./add-product-form";
 import { ProductList } from "./product-list";

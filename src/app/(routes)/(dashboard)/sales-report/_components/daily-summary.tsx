@@ -3,8 +3,8 @@
 import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSales } from "@/hooks/business/use-sales";
-import { formatCurrency } from "@/lib/utils";
+import { useSales } from "@/features/sales";
+import { formatCurrency } from "@/lib";
 
 export function DailySummary() {
   const { completedSales } = useSales();
@@ -24,14 +24,12 @@ export function DailySummary() {
         const total = venda.items.reduce((sum, item) => {
           let itemTotal = 0;
 
-          // Calcula o valor base do item
           if (item.product.type === "weight") {
             itemTotal = (item.product.price * (item.weight || 0)) / 1000;
           } else {
             itemTotal = item.product.price * (item.quantity || 1);
           }
 
-          // Adiciona o valor dos adicionais
           if (item.addons && item.addons.length > 0) {
             itemTotal += item.addons.reduce(
               (addonSum, addon) =>

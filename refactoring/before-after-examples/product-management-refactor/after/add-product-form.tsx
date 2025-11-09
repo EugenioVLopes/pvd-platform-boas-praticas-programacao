@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Product } from "@/types/product";
+import { Product } from "@/features/products";
 
 interface NewProductData {
   name: string;
@@ -27,7 +27,7 @@ interface AddProductFormProps {
 /**
  * Componente responsável apenas por renderizar o formulário de adição de produtos
  * e gerenciar seu estado interno.
- * 
+ *
  * Princípios aplicados:
  * - Single Responsibility Principle: Apenas gerencia o formulário
  * - Separation of Concerns: Não conhece a lógica de persistência
@@ -43,7 +43,11 @@ export function AddProductForm({ onAddProduct }: AddProductFormProps) {
 
   const handleSubmit = () => {
     // Validação básica
-    if (!newProduct.name.trim() || !newProduct.price || !newProduct.category.trim()) {
+    if (
+      !newProduct.name.trim() ||
+      !newProduct.price ||
+      !newProduct.category.trim()
+    ) {
       return;
     }
 
@@ -72,10 +76,11 @@ export function AddProductForm({ onAddProduct }: AddProductFormProps) {
   };
 
   const updateField = (field: keyof NewProductData, value: string) => {
-    setNewProduct(prev => ({ ...prev, [field]: value }));
+    setNewProduct((prev) => ({ ...prev, [field]: value }));
   };
 
-  const isFormValid = newProduct.name.trim() && newProduct.price && newProduct.category.trim();
+  const isFormValid =
+    newProduct.name.trim() && newProduct.price && newProduct.category.trim();
 
   return (
     <div className="flex space-x-2">
@@ -109,10 +114,7 @@ export function AddProductForm({ onAddProduct }: AddProductFormProps) {
           <SelectItem value="weight">Por Peso</SelectItem>
         </SelectContent>
       </Select>
-      <Button 
-        onClick={handleSubmit}
-        disabled={!isFormValid}
-      >
+      <Button onClick={handleSubmit} disabled={!isFormValid}>
         Adicionar Produto
       </Button>
     </div>

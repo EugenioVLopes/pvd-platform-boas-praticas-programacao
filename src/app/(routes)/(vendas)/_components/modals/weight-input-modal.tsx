@@ -98,7 +98,9 @@ export function WeightInputModal({
                 min="0"
                 autoFocus
                 className={`h-12 text-lg font-medium ${
-                  error ? "border-destructive focus-visible:ring-destructive" : ""
+                  error
+                    ? "border-destructive focus-visible:ring-destructive"
+                    : ""
                 }`}
               />
               {weight && (

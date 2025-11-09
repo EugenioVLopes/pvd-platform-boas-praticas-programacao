@@ -5,8 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { formatCurrency } from "@/lib/utils";
-import { Order } from "@/types/order";
+import { formatCurrency } from "@/lib";
+import { Order } from "@/features/sales";
 
 import { OrderItemsTable } from "./order-items-table";
 

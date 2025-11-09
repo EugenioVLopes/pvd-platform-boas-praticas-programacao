@@ -13,18 +13,20 @@ Repositório do projeto desenvolvido para a disciplina **Boas Práticas de Progr
 
 ## 📋 Pré-requisitos
 
-- Node.js 18+ 
+- Node.js 18+
 - npm, yarn, pnpm ou bun
 
 ## 🔧 Instalação e Execução
 
 1. Clone o repositório:
+
 ```bash
 git clone https://github.com/seu-usuario/pvd-platform-boas-praticas-programacao.git
 cd pvd-platform-boas-praticas-programacao
 ```
 
 2. Instale as dependências:
+
 ```bash
 npm install
 # ou
@@ -34,6 +36,7 @@ pnpm install
 ```
 
 3. Execute o servidor de desenvolvimento:
+
 ```bash
 npm run dev
 # ou

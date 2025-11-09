@@ -2,7 +2,7 @@
 
 import { IceCream } from "lucide-react";
 
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib";
 import { MetricCard } from "./metric-card";
 
 interface DashboardMetricsProps {

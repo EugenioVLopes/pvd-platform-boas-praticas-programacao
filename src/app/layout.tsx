@@ -3,8 +3,8 @@ import "./globals.css";
 import { Metadata, Viewport } from "next";
 import { Geist_Mono } from "next/font/google";
 
-import { MainSidebar } from "@/components/sidebar-nav";
-import { ThemeProvider } from "@/components/theme-provider";
+import { MainSidebar } from "@/components/layout";
+import { ThemeProvider } from "@/components/providers";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,7 +19,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/toaster";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",

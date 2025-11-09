@@ -1,7 +1,6 @@
-import type { Product } from "@/types/product";
+import type { Product } from "@/features/products";
 
 export const INITIAL_PRODUCTS: Product[] = [
-  // Sorvetes
   {
     id: 1,
     name: "Tapioca",
@@ -100,8 +99,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: "Sorvetes",
     type: "unit",
   },
-
-  // Milkshakes
   {
     id: 15,
     name: "Milkshake Chocolate 300ml",
@@ -130,8 +127,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: "Milkshakes",
     type: "unit",
   },
-
-  // Milkshakes Premium
   {
     id: 19,
     name: "Milkshake Ovomaltine 300ml",
@@ -174,8 +169,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: "Milkshakes Premium",
     type: "unit",
   },
-
-  // Açaí
   {
     id: 25,
     name: "Açaí/Sorvete no Peso",
@@ -183,8 +176,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: "Açaí",
     type: "weight",
   },
-
-  // Monte do Seu Jeito
   {
     id: 26,
     name: "Monte do Seu Jeito 200ml",
@@ -221,8 +212,6 @@ export const INITIAL_PRODUCTS: Product[] = [
       acompanhamentos: 5,
     },
   },
-
-  // Cremes
   {
     id: 29,
     name: "Açaí",
@@ -272,8 +261,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: "Cremes",
     type: "option",
   },
-
-  // Frutas
   {
     id: 36,
     name: "Banana",
@@ -295,8 +282,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: "Frutas",
     type: "option",
   },
-
-  // Acompanhamentos
   {
     id: 39,
     name: "Granulado de chocolate",
@@ -507,8 +492,6 @@ export const INITIAL_PRODUCTS: Product[] = [
     category: "Acompanhamentos",
     type: "option",
   },
-
-  // Adicionais
   {
     id: 69,
     name: "Creme de Cookies",

@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useProducts } from "@/hooks/business/use-products";
-import { Product, SaleItem } from "@/types/product";
+import { useProducts, Product } from "@/features/products";
+import { SaleItem } from "@/features/products";
 
 interface OrderItemRowProps {
   item: SaleItem;
@@ -32,7 +32,6 @@ export function OrderItemRow({ item, onRemove, onUpdate }: OrderItemRowProps) {
     (p) => p.category === "Acompanhamentos"
   );
 
-  // Calcula o subtotal baseada no tipo do produto (por peso ou unidade)
   const subtotal =
     (item.product.type === "weight"
       ? (item.product.price * (item.weight || 0)) / 1000

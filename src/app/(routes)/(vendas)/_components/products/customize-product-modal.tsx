@@ -21,8 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useProducts } from "@/hooks/business/use-products";
-import { Product } from "@/types/product";
+import { useProducts, Product } from "@/features/products";
 
 interface CustomizeProductModalProps {
   isOpen: boolean;
@@ -57,7 +56,6 @@ export function CustomizeProductModal({
   const [cremesSearch, setCremesSearch] = useState("");
   const [acompanhamentosSearch, setAcompanhamentosSearch] = useState("");
 
-  // Resetar opções e buscas quando o modal for aberto
   useEffect(() => {
     if (isOpen) {
       setSelectedOptions(emptyOptions);
@@ -100,7 +98,7 @@ export function CustomizeProductModal({
         [category]: [...current, name],
       };
     });
-    setSearch(""); // Limpa o campo de busca após seleção
+    setSearch("");
   };
 
   const isValid = () => {
@@ -155,7 +153,6 @@ export function CustomizeProductModal({
 
         {product && (
           <div className="flex flex-col space-y-6 overflow-y-auto px-6 py-6">
-            {/* Resumo das seleções */}
             {(selectedOptions.frutas.length > 0 ||
               selectedOptions.cremes.length > 0 ||
               selectedOptions.acompanhamentos.length > 0) && (
@@ -219,9 +216,7 @@ export function CustomizeProductModal({
               </div>
             )}
 
-            {/* Grid de seleção */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {/* Frutas */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-semibold text-foreground">
@@ -285,7 +280,6 @@ export function CustomizeProductModal({
                 </Command>
               </div>
 
-              {/* Cremes */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-semibold text-foreground">
@@ -349,7 +343,6 @@ export function CustomizeProductModal({
                 </Command>
               </div>
 
-              {/* Acompanhamentos */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-semibold text-foreground">

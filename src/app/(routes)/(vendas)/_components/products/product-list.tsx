@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Product } from "@/types/product";
+import type { Product } from "@/features/products";
 
 interface ProductListProps {
   products: Product[];

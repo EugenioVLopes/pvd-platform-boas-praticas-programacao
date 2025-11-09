@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SaleItem } from "@/types/product";
+import { SaleItem } from "@/features/products";
 
 import { OrderItemRow } from "./order-item-row";
 

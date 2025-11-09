@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
-import { Order } from "@/types/order";
+import { formatCurrency } from "@/lib";
+import { Order } from "@/features/sales";
 
 import { OrderItemsTable } from "./order-items-table";
 
@@ -18,7 +18,7 @@ export function CurrentOrderView({
   calculateOrderTotal,
 }: CurrentOrderViewProps) {
   return (
-    <div className="bg-card rounded-lg p-4 shadow-sm">
+    <div className="rounded-lg bg-card p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-xl font-semibold">
           Comanda de {order.customerName}

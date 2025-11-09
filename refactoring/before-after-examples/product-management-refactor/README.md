@@ -49,11 +49,13 @@ after/
 ### 1. ProductManagement (Container)
 
 **Responsabilidades:**
+
 - Gerenciar estado global dos produtos
 - Coordenar comunicação entre componentes
 - Implementar lógica de negócio
 
 **Melhorias:**
+
 - ✅ Foco na coordenação e estado
 - ✅ Composição de componentes menores
 - ✅ Injeção de dependências via props
@@ -61,11 +63,13 @@ after/
 ### 2. AddProductForm (Presentational)
 
 **Responsabilidades:**
+
 - Gerenciar estado interno do formulário
 - Validar dados de entrada
 - Comunicar dados válidos ao pai
 
 **Melhorias:**
+
 - ✅ Componente reutilizável
 - ✅ Validação centralizada
 - ✅ Estado isolado
@@ -74,11 +78,13 @@ after/
 ### 3. ProductList (Presentational)
 
 **Responsabilidades:**
+
 - Renderizar lista de produtos
 - Exibir estado vazio
 - Formatação de dados
 
 **Melhorias:**
+
 - ✅ Componente puro (sem estado)
 - ✅ Funções utilitárias extraídas
 - ✅ Tratamento de casos extremos
@@ -88,13 +94,13 @@ after/
 
 ### Qualidade do Código
 
-| Aspecto | Antes | Depois |
-|---------|-------|--------|
-| **Linhas por componente** | 105 | 45-65 |
-| **Responsabilidades** | 4+ | 1 cada |
-| **Reutilização** | Baixa | Alta |
-| **Testabilidade** | Difícil | Fácil |
-| **Manutenibilidade** | Baixa | Alta |
+| Aspecto                   | Antes   | Depois |
+| ------------------------- | ------- | ------ |
+| **Linhas por componente** | 105     | 45-65  |
+| **Responsabilidades**     | 4+      | 1 cada |
+| **Reutilização**          | Baixa   | Alta   |
+| **Testabilidade**         | Difícil | Fácil  |
+| **Manutenibilidade**      | Baixa   | Alta   |
 
 ### Princípios SOLID Aplicados
 
@@ -111,9 +117,10 @@ after/
 ## 🧪 Testabilidade
 
 ### Antes da Refatoração
+
 ```typescript
 // Difícil de testar - múltiplas responsabilidades
-test('ProductManagement', () => {
+test("ProductManagement", () => {
   // Como testar apenas o formulário?
   // Como testar apenas a lista?
   // Como mockar o hook useProducts?
@@ -121,17 +128,18 @@ test('ProductManagement', () => {
 ```
 
 ### Após a Refatoração
+
 ```typescript
 // Fácil de testar - responsabilidades isoladas
-test('AddProductForm', () => {
+test("AddProductForm", () => {
   // Testa apenas o formulário
 });
 
-test('ProductList', () => {
+test("ProductList", () => {
   // Testa apenas a renderização
 });
 
-test('ProductManagement', () => {
+test("ProductManagement", () => {
   // Testa apenas a coordenação
 });
 ```
@@ -139,26 +147,31 @@ test('ProductManagement', () => {
 ## 📊 Métricas de Qualidade
 
 ### Complexidade Ciclomática
+
 - **Antes**: 8 (Alta)
 - **Depois**: 3-4 por componente (Baixa)
 
 ### Acoplamento
+
 - **Antes**: Alto (tudo em um componente)
 - **Depois**: Baixo (interfaces bem definidas)
 
 ### Coesão
+
 - **Antes**: Baixa (responsabilidades misturadas)
 - **Depois**: Alta (responsabilidade única)
 
 ## 🚀 Como Usar
 
 ### Implementação Original
+
 ```typescript
 // Componente monolítico
 <ProductManagement />
 ```
 
 ### Implementação Refatorada
+
 ```typescript
 // Componente modular e reutilizável
 <ProductManagement />

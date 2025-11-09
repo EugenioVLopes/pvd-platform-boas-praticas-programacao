@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Product } from "@/types/product";
+import { Product } from "@/features/products";
 
 interface ProductListProps {
   products: Product[];

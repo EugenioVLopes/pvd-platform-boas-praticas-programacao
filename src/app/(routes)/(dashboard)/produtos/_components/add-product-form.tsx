@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Product } from "@/types/product";
+import { Product } from "@/features/products";
 
 interface NewProductData {
   name: string;

@@ -2,9 +2,9 @@
 
 import dynamic from "next/dynamic";
 
-import { useSalesProcessing } from "@/hooks/business/use-sales-processing";
-import { PRODUCT_CATEGORIES, ProductCategory } from "@/lib/constants/products";
-import { calculateItemTotal } from "@/lib/calculations";
+import { useSalesProcessing } from "@/features/sales";
+import { PRODUCT_CATEGORIES, ProductCategory } from "@/lib/constants";
+import { calculateItemTotal } from "@/lib";
 
 import { CartSection } from "./cart/cart-section";
 import { SalesHeader } from "./header/sales-header";

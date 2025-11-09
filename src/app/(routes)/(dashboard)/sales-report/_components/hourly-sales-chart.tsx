@@ -3,8 +3,8 @@
 import { ResponsiveBar } from "@nivo/bar";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/utils";
-import type { SalesReport } from "@/types/order";
+import { formatCurrency } from "@/lib";
+import type { SalesReport } from "@/features/sales";
 
 const SORVETE_COLORS = [
   "#ff9eb8", // Rosa claro (pastel)

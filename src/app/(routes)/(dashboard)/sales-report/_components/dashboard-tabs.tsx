@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { SalesReport } from "@/types/order";
+import type { SalesReport } from "@/features/sales";
 
 import { DailySummary } from "./daily-summary";
 import { SalesReportHourlyChart } from "./hourly-sales-chart";

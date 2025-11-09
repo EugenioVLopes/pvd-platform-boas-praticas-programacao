@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
 import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
-import { SaleItem } from "@/types/product";
+import { formatCurrency } from "@/lib";
+import { SaleItem } from "@/features/products";
 
 import { OrderItemsTable } from "../orders/order-items-table";
 

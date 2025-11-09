@@ -29,7 +29,7 @@ export function ProductCategories({
           categories.map((category) => (
             <Card
               key={category}
-              className="hover:border-primary cursor-pointer border border-gray-200 transition-all duration-200 hover:shadow-sm"
+              className="cursor-pointer border border-gray-200 transition-all duration-200 hover:border-primary hover:shadow-sm"
               onClick={() => onSelectCategory(category)}
             >
               <CardContent className="flex min-h-[100px] flex-col items-center justify-center p-6 sm:min-h-[160px]">

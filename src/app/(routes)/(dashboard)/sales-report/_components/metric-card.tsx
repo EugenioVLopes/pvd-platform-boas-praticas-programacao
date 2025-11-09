@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib";
 
 interface MetricCardProps {
   title: string;
@@ -30,7 +30,7 @@ export function MetricCard({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{value}</div>
-          <p className="text-muted-foreground text-xs">{description}</p>
+          <p className="text-xs text-muted-foreground">{description}</p>
         </CardContent>
       </Card>
     </motion.div>

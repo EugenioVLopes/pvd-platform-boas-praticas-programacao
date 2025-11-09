@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib";
 
 interface TopProductsTableProps {
   products: { name: string; quantity: number; revenue: number }[];

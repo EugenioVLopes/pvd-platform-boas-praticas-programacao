@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import type { Order } from "@/types/order";
+import type { Order } from "@/features/sales";
 
 interface SalesHeaderProps {
   showProducts: boolean;

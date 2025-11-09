@@ -1,4 +1,4 @@
-import type { Product } from "@/types/product";
+import type { Product } from "@/features/products";
 
 // ✅ SOLUÇÃO: Dados separados em arquivo dedicado
 // - Facilita manutenção e atualizações

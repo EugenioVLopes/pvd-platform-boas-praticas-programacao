@@ -2,11 +2,9 @@
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
 
-import { useSales } from "@/hooks/business/use-sales";
-import { useSalesReport } from "@/hooks/reports/use-sales-report";
-import { getDateRangeForReportType } from "@/lib/reports";
-
-import { AuthGuard } from "../../../../components/auth/auth-guard";
+import { useSales } from "@/features/sales";
+import { useSalesReport, getDateRangeForReportType } from "@/features/reports";
+import { AuthGuard } from "@/features/auth";
 import { SalesReportHeader } from "./_components/dashboard-header";
 import { SalesReportMetrics } from "./_components/dashboard-metrics";
 import { SalesReportTabs } from "./_components/dashboard-tabs";
@@ -14,11 +12,10 @@ import { SalesReportTabs } from "./_components/dashboard-tabs";
 export default function DashboardPage() {
   const { completedSales } = useSales();
 
-  // Estado inicial: relatório do dia atual
   const today = new Date();
   const [dateRange, setDateRange] = useState<DateRange>({
-    from: new Date(today.setHours(0, 0, 0, 0)), // Início do dia atual
-    to: new Date(today.setHours(23, 59, 59, 999)), // Fim do dia atual
+    from: new Date(today.setHours(0, 0, 0, 0)),
+    to: new Date(today.setHours(23, 59, 59, 999)),
   });
   const [reportType, setReportType] = useState<"daily" | "weekly" | "monthly">(
     "daily"
@@ -29,7 +26,6 @@ export default function DashboardPage() {
     dateRange,
   });
 
-  // ✅ BENEFÍCIO: Lógica de mudança de período simplificada
   const handleReportTypeChange = (value: "daily" | "weekly" | "monthly") => {
     setReportType(value);
     setDateRange(getDateRangeForReportType(value));
