@@ -13,27 +13,7 @@ import {
 } from "@/types/cart";
 import type { SaleItem } from "@/types/product";
 
-/**
- * Utilitários para manipulação e validação de carrinho de compras
- */
 export class CartUtils {
-  /**
-   * Cria um erro de carrinho padronizado
-   *
-   * @param type - Tipo do erro
-   * @param message - Mensagem personalizada (opcional)
-   * @param details - Detalhes adicionais do erro
-   * @returns Erro formatado
-   *
-   * @example
-   * ```typescript
-   * const error = CartUtils.createError(
-   *   CartErrorType.INVALID_QUANTITY,
-   *   "Quantidade deve ser maior que zero",
-   *   { currentValue: -1, expectedValue: ">= 1" }
-   * );
-   * ```
-   */
   static createError(
     type: CartErrorType,
     message?: string,
@@ -48,25 +28,6 @@ export class CartUtils {
     };
   }
 
-  /**
-   * Valida um item individual do carrinho
-   *
-   * @param item - Item a ser validado
-   * @param config - Configuração de validação
-   * @returns Resultado da validação
-   *
-   * @example
-   * ```typescript
-   * const validation = CartUtils.validateSingleItem(item, {
-   *   requireWeightForWeightProducts: true,
-   *   minimumQuantity: 1
-   * });
-   *
-   * if (!validation.isValid) {
-   *   validation.errors.forEach(error => console.error(error.message));
-   * }
-   * ```
-   */
   static validateSingleItem(
     item: SaleItem,
     config: CartValidationConfig = {}
@@ -188,20 +149,6 @@ export class CartUtils {
     };
   }
 
-  /**
-   * Calcula estatísticas detalhadas do carrinho
-   *
-   * @param items - Itens do carrinho
-   * @param taxRate - Taxa de imposto (opcional)
-   * @returns Estatísticas calculadas
-   *
-   * @example
-   * ```typescript
-   * const stats = CartUtils.calculateStatistics(cartItems, 0.1);
-   * console.log(`Total: R$ ${stats.total.toFixed(2)}`);
-   * console.log(`Categorias: ${stats.categories.join(", ")}`);
-   * ```
-   */
   static calculateStatistics(
     items: SaleItem[],
     taxRate: number = CART_VALIDATION_CONSTANTS.DEFAULT_TAX_RATE
@@ -261,18 +208,6 @@ export class CartUtils {
     };
   }
 
-  /**
-   * Calcula o total de um item específico
-   *
-   * @param item - Item para calcular o total
-   * @returns Valor total do item
-   *
-   * @example
-   * ```typescript
-   * const itemTotal = CartUtils.calculateItemTotal(saleItem);
-   * console.log(`Item total: R$ ${itemTotal.toFixed(2)}`);
-   * ```
-   */
   static calculateItemTotal(item: SaleItem): number {
     let total = 0;
 
@@ -298,21 +233,6 @@ export class CartUtils {
     return total;
   }
 
-  /**
-   * Filtra itens do carrinho baseado em critérios
-   *
-   * @param items - Itens a serem filtrados
-   * @param filter - Critérios de filtro
-   * @returns Itens filtrados
-   *
-   * @example
-   * ```typescript
-   * const foodItems = CartUtils.filterItems(items, {
-   *   category: "food",
-   *   priceRange: { min: 10, max: 50 }
-   * });
-   * ```
-   */
   static filterItems(items: SaleItem[], filter: CartItemFilter): SaleItem[] {
     return items.filter((item) => {
       if (filter.category && item.product?.category !== filter.category) {
@@ -365,21 +285,6 @@ export class CartUtils {
     });
   }
 
-  /**
-   * Ordena itens do carrinho
-   *
-   * @param items - Itens a serem ordenados
-   * @param options - Opções de ordenação
-   * @returns Itens ordenados
-   *
-   * @example
-   * ```typescript
-   * const sortedItems = CartUtils.sortItems(items, {
-   *   field: "price",
-   *   direction: "desc"
-   * });
-   * ```
-   */
   static sortItems(items: SaleItem[], options: CartSortOptions): SaleItem[] {
     const { field, direction } = options;
     const multiplier = direction === "asc" ? 1 : -1;
@@ -425,20 +330,6 @@ export class CartUtils {
     });
   }
 
-  /**
-   * Agrupa itens por categoria
-   *
-   * @param items - Itens a serem agrupados
-   * @returns Itens agrupados por categoria
-   *
-   * @example
-   * ```typescript
-   * const grouped = CartUtils.groupByCategory(items);
-   * Object.entries(grouped).forEach(([category, items]) => {
-   *   console.log(`${category}: ${items.length} itens`);
-   * });
-   * ```
-   */
   static groupByCategory(items: SaleItem[]): Record<string, SaleItem[]> {
     return items.reduce(
       (groups, item) => {
@@ -453,21 +344,6 @@ export class CartUtils {
     );
   }
 
-  /**
-   * Verifica se dois itens são equivalentes (mesmo produto e opções)
-   *
-   * @param itemA - Primeiro item
-   * @param itemB - Segundo item
-   * @returns Se os itens são equivalentes
-   *
-   * @example
-   * ```typescript
-   * const isDuplicate = CartUtils.areItemsEquivalent(newItem, existingItem);
-   * if (isDuplicate) {
-   *   console.log("Item já existe no carrinho");
-   * }
-   * ```
-   */
   static areItemsEquivalent(itemA: SaleItem, itemB: SaleItem): boolean {
     if (itemA.product?.id !== itemB.product?.id) {
       return false;
@@ -510,20 +386,6 @@ export class CartUtils {
     );
   }
 
-  /**
-   * Formata valor monetário para exibição
-   *
-   * @param value - Valor a ser formatado
-   * @param currency - Moeda (padrão: "BRL")
-   * @param locale - Localização (padrão: "pt-BR")
-   * @returns Valor formatado
-   *
-   * @example
-   * ```typescript
-   * const formatted = CartUtils.formatCurrency(123.45);
-   * console.log(formatted); // "R$ 123,45"
-   * ```
-   */
   static formatCurrency(
     value: number,
     currency: string = "BRL",
@@ -535,18 +397,6 @@ export class CartUtils {
     }).format(value);
   }
 
-  /**
-   * Formata peso para exibição
-   *
-   * @param weightInGrams - Peso em gramas
-   * @returns Peso formatado
-   *
-   * @example
-   * ```typescript
-   * const formatted = CartUtils.formatWeight(1500);
-   * console.log(formatted); // "1,5 kg"
-   * ```
-   */
   static formatWeight(weightInGrams: number): string {
     if (weightInGrams >= 1000) {
       return `${(weightInGrams / 1000).toFixed(1).replace(".", ",")} kg`;

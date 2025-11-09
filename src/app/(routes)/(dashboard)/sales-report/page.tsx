@@ -4,7 +4,7 @@ import type { DateRange } from "react-day-picker";
 
 import { useSales } from "@/hooks/business/use-sales";
 import { useSalesReport } from "@/hooks/reports/use-sales-report";
-import { getDateRangeForReportType } from "@/lib/utils/sales-report";
+import { getDateRangeForReportType } from "@/lib/reports";
 
 import { AuthGuard } from "../../../../components/auth/auth-guard";
 import { SalesReportHeader } from "./_components/dashboard-header";

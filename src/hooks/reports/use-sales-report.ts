@@ -1,7 +1,7 @@
 import {
   calculateSalesReport,
   getDateRangeForReportType,
-} from "@/lib/utils/sales-report";
+} from "@/lib/reports";
 import type { Order, SalesReport } from "@/types/order";
 import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";

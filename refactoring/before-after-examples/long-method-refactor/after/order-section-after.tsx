@@ -5,7 +5,7 @@ import { formatCurrency } from "@/lib/utils";
 import {
   generateOrderPrintTemplate,
   printHtmlContent,
-} from "@/lib/utils/print-template";
+} from "@/lib/print";
 import { Order } from "@/types/order";
 import { SaleItem } from "@/types/product";
 

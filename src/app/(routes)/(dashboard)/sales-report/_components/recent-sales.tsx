@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSales } from "@/hooks/business/use-sales";
 import { formatCurrency } from "@/lib/utils";
-import { formatDate } from "@/lib/utils/calculations";
+import { formatDate } from "@/lib/formatting";
 
 interface RecentSalesProps {
   limit?: number; // Número de vendas recentes a exibir (padrão: 5)
