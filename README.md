@@ -201,5 +201,4 @@ Este projeto é desenvolvido para fins acadêmicos como parte da disciplina de B
 
 ---
 
-**Desenvolvido para a disciplina Boas Práticas de Programação**  
 **Responsável**: Eugenio Vitor Lopes dos Santos
