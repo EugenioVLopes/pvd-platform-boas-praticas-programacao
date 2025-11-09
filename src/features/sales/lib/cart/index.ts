@@ -1,3 +1,4 @@
+import type { SaleItem } from "@/features/products";
 import type {
   CartError,
   CartItemFilter,
@@ -7,11 +8,10 @@ import type {
   CartValidationConfig,
 } from "@/features/sales/types";
 import {
-  CartErrorType,
   CART_ERROR_MESSAGES,
   CART_VALIDATION_CONSTANTS,
+  CartErrorType,
 } from "@/features/sales/types";
-import type { SaleItem } from "@/features/products";
 
 export class CartUtils {
   static createError(
@@ -374,8 +374,8 @@ export class CartUtils {
     }
 
     const compareArrays = (arrA?: string[], arrB?: string[]) => {
-      const a = (arrA || []).sort();
-      const b = (arrB || []).sort();
+      const a = (arrA || []).sort((x, y) => x.localeCompare(y));
+      const b = (arrB || []).sort((x, y) => x.localeCompare(y));
       return a.length === b.length && a.every((val, i) => val === b[i]);
     };
 
