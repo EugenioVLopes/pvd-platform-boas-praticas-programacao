@@ -29,7 +29,7 @@ export class CartUtils {
   }
 
   private static validateProduct(item: SaleItem): CartError | null {
-    if (!item.product || !item.product.id) {
+    if (!item.product?.id) {
       return this.createError(
         CartErrorType.INVALID_PRODUCT,
         "Item deve ter um produto válido"
@@ -223,7 +223,7 @@ export class CartUtils {
       total: this.calculateItemTotal(item),
     }));
 
-    const sortedByPrice = itemTotals.sort((a, b) => a.total - b.total);
+    const sortedByPrice = itemTotals.toSorted((a, b) => a.total - b.total);
     const cheapestItem = sortedByPrice[0]?.item;
     const mostExpensiveItem = sortedByPrice[sortedByPrice.length - 1]?.item;
 
