@@ -1,5 +1,5 @@
-import type { Order } from "@/features/sales";
 import type { SaleItem } from "@/features/products";
+import type { Order } from "@/features/sales";
 
 export function calculateItemTotal(item: SaleItem): number {
   if (item.product.type === "weight" && item.weight) {
@@ -7,7 +7,10 @@ export function calculateItemTotal(item: SaleItem): number {
   }
   const basePrice = item.product.price * (item.quantity ?? 1);
   const addonsPrice =
-    item.addons?.reduce((sum, addon) => sum + addon.price, 0) ?? 0;
+    item.addons?.reduce(
+      (sum, addon) => sum + addon.price * (item.quantity ?? 1),
+      0
+    ) ?? 0;
   return basePrice + addonsPrice;
 }
 

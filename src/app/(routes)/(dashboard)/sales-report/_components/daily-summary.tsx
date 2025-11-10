@@ -3,8 +3,26 @@
 import { useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Order } from "@/features/sales";
 import { useSales } from "@/features/sales";
-import { formatCurrency } from "@/lib";
+import { calculateOrderTotal, formatCurrency } from "@/lib";
+
+function isVendaDeHoje(venda: Order, today: Date): boolean {
+  const vendaDate = new Date(venda.finalizadaEm || venda.createdAt);
+  return vendaDate >= today;
+}
+
+function calcularTotaisPorMetodo(vendasHoje: Order[]): Record<string, number> {
+  return vendasHoje.reduce(
+    (acc, venda) => {
+      const method = venda.paymentMethod?.toLowerCase() || "outros";
+      const total = calculateOrderTotal(venda);
+      acc[method] = (acc[method] || 0) + total;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+}
 
 export function DailySummary() {
   const { completedSales } = useSales();
@@ -13,39 +31,11 @@ export function DailySummary() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const vendasHoje = completedSales.filter((venda) => {
-      const vendaDate = new Date(venda.finalizadaEm || venda.createdAt);
-      return vendaDate >= today;
-    });
-
-    const totaisPorMetodo = vendasHoje.reduce(
-      (acc, venda) => {
-        const method = venda.paymentMethod?.toLowerCase() || "outros";
-        const total = venda.items.reduce((sum, item) => {
-          let itemTotal = 0;
-
-          if (item.product.type === "weight") {
-            itemTotal = (item.product.price * (item.weight || 0)) / 1000;
-          } else {
-            itemTotal = item.product.price * (item.quantity || 1);
-          }
-
-          if (item.addons && item.addons.length > 0) {
-            itemTotal += item.addons.reduce(
-              (addonSum, addon) =>
-                addonSum + addon.price * (item.quantity || 1),
-              0
-            );
-          }
-
-          return sum + itemTotal;
-        }, 0);
-
-        acc[method] = (acc[method] || 0) + total;
-        return acc;
-      },
-      {} as Record<string, number>
+    const vendasHoje = completedSales.filter((venda) =>
+      isVendaDeHoje(venda, today)
     );
+
+    const totaisPorMetodo = calcularTotaisPorMetodo(vendasHoje);
 
     const totalDoDia = Object.values(totaisPorMetodo).reduce(
       (a, b) => a + b,
