@@ -34,7 +34,7 @@ export function RecentSales({ limit = 5 }: RecentSalesProps) {
 
   const recentSales = useMemo(() => {
     return completedSales
-      .sort(
+      .toSorted(
         (a, b) =>
           new Date(b.finalizadaEm || b.createdAt).getTime() -
           new Date(a.finalizadaEm || a.createdAt).getTime()
