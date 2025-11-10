@@ -1,13 +1,10 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import type { Product } from "@/features/products";
 import type { BaseHookOptions } from "@/types";
 
-/**
- * Estado completo da interface de vendas
- */
 export interface SalesUIState {
   isWeightModalOpen: boolean;
   isPaymentModalOpen: boolean;
@@ -27,19 +24,11 @@ export interface SalesUIState {
   paymentProcessing: boolean;
 }
 
-/**
- * Opções de configuração para o hook useSalesUI
- */
 export interface UseSalesUIOptions extends BaseHookOptions {
-  /** Estado inicial personalizado */
   initialState?: Partial<SalesUIState>;
-  /** Se deve resetar o estado ao fechar modais */
   autoReset?: boolean;
 }
 
-/**
- * Ações disponíveis para gerenciar o estado da UI
- */
 export interface SalesUIActions {
   openWeightModal: (product: Product) => void;
   openPaymentModal: () => void;
@@ -74,9 +63,6 @@ export interface SalesUIActions {
   resetState: () => void;
 }
 
-/**
- * Interface de retorno do hook useSalesUI
- */
 export interface UseSalesUIReturn {
   state: SalesUIState;
   actions: SalesUIActions;
@@ -85,9 +71,6 @@ export interface UseSalesUIReturn {
   canShowProducts: boolean;
 }
 
-/**
- * Estado inicial padrão
- */
 const DEFAULT_STATE: SalesUIState = {
   isWeightModalOpen: false,
   isPaymentModalOpen: false,
@@ -107,53 +90,6 @@ const DEFAULT_STATE: SalesUIState = {
   paymentProcessing: false,
 };
 
-/**
- * Hook para gerenciar estado da interface de vendas
- *
- * Extrai e centraliza todo o gerenciamento de estado da UI que estava
- * espalhado no `useSalesProcessing`, incluindo:
- * - Estados de modais
- * - Seleções de produtos e categorias
- * - Estados de visualização
- * - Controle de fluxo da interface
- *
- * @param options - Opções de configuração do hook
- * @returns Objeto com estado e ações para gerenciar a UI de vendas
- *
- * @example
- * ```tsx
- * function SalesInterface() {
- *   const { state, actions, hasOpenModal } = useSalesUI({
- *     autoReset: true
- *   });
- *
- *   const handleProductSelect = (product: Product) => {
- *     if (product.type === 'weight') {
- *       actions.openWeightModal(product);
- *     } else if (product.options) {
- *       actions.openCustomizeModal(product);
- *     } else {
- *       // Adicionar diretamente ao carrinho
- *       actions.selectProduct(product);
- *     }
- *   };
- *
- *   return (
- *     <div>
- *       {state.showProducts && (
- *         <ProductGrid onProductSelect={handleProductSelect} />
- *       )}
- *
- *       <WeightModal
- *         isOpen={state.isWeightModalOpen}
- *         product={state.selectedProduct}
- *         onClose={() => actions.closeModal('isWeightModalOpen')}
- *       />
- *     </div>
- *   );
- * }
- * ```
- */
 export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
   const { enabled = true, initialState = {}, autoReset = true } = options;
 
@@ -208,7 +144,7 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
   const openNewOrderModal = useCallback(() => {
     updateState({
       isNewOrderModalOpen: true,
-      newOrderName: "", // Reset nome
+      newOrderName: "",
     });
   }, [updateState]);
 
@@ -401,20 +337,20 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     [updateState]
   );
 
-  const getCurrentModal = useCallback((): string | null => {
-    const modalStateMap: Record<
-      keyof Pick<
-        SalesUIState,
-        | "isWeightModalOpen"
-        | "isPaymentModalOpen"
-        | "isCustomizeModalOpen"
-        | "isNewOrderModalOpen"
-        | "isActionModalOpen"
-        | "isProductDetailsOpen"
-        | "isCategoryOpen"
-      >,
-      string
-    > = {
+  const modalStateMap: Record<
+    keyof Pick<
+      SalesUIState,
+      | "isWeightModalOpen"
+      | "isPaymentModalOpen"
+      | "isCustomizeModalOpen"
+      | "isNewOrderModalOpen"
+      | "isActionModalOpen"
+      | "isProductDetailsOpen"
+      | "isCategoryOpen"
+    >,
+    string
+  > = useMemo(
+    () => ({
       isWeightModalOpen: "weight",
       isPaymentModalOpen: "payment",
       isCustomizeModalOpen: "customize",
@@ -422,26 +358,39 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
       isActionModalOpen: "action",
       isProductDetailsOpen: "productDetails",
       isCategoryOpen: "category",
-    };
+    }),
+    []
+  );
 
+  const hasOpenModal = useMemo(
+    () =>
+      !!(
+        state.isWeightModalOpen ||
+        state.isPaymentModalOpen ||
+        state.isCustomizeModalOpen ||
+        state.isNewOrderModalOpen ||
+        state.isActionModalOpen ||
+        state.isProductDetailsOpen ||
+        state.isCategoryOpen
+      ),
+    [
+      state.isWeightModalOpen,
+      state.isPaymentModalOpen,
+      state.isCustomizeModalOpen,
+      state.isNewOrderModalOpen,
+      state.isActionModalOpen,
+      state.isProductDetailsOpen,
+      state.isCategoryOpen,
+    ]
+  );
+
+  const currentModal = useMemo((): string | null => {
     const modalKey = Object.keys(modalStateMap).find(
       (key) => state[key as keyof SalesUIState]
     ) as keyof typeof modalStateMap | undefined;
 
     return modalKey ? modalStateMap[modalKey] : null;
-  }, [state]);
-
-  const hasOpenModal = !!(
-    state.isWeightModalOpen ||
-    state.isPaymentModalOpen ||
-    state.isCustomizeModalOpen ||
-    state.isNewOrderModalOpen ||
-    state.isActionModalOpen ||
-    state.isProductDetailsOpen ||
-    state.isCategoryOpen
-  );
-
-  const currentModal = getCurrentModal();
+  }, [state, modalStateMap]);
 
   const canShowProducts = !hasOpenModal && !!state.selectedCategory;
 

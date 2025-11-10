@@ -293,7 +293,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
     (product: Product): boolean => {
       if (!enabled) return false;
       if (items.length >= maxItems) return false;
-      if (!product || !product.id) return false;
+      if (!product?.id) return false;
       return true;
     },
     [enabled, items.length, maxItems]
