@@ -1,5 +1,5 @@
-import type { BaseHookOptions, PersistenceOptions } from "@/types";
 import type { Product, SaleItem } from "@/features/products";
+import type { BaseHookOptions, PersistenceOptions } from "@/types";
 
 export enum CartErrorType {
   VALIDATION_ERROR = "VALIDATION_ERROR",
@@ -156,6 +156,9 @@ export interface UseCartReturn {
     total: number;
     taxRate: number;
   };
+  filterItems: (filter: CartItemFilter) => SaleItem[];
+  sortItems: (options: CartSortOptions) => SaleItem[];
+  groupByCategory: () => Record<string, SaleItem[]>;
   isValid: boolean;
   validationErrors: CartError[];
   validationWarnings: string[];
