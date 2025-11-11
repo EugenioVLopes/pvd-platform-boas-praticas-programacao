@@ -24,6 +24,17 @@ export interface SalesUIState {
   paymentProcessing: boolean;
 }
 
+type ModalStateKey = keyof Pick<
+  SalesUIState,
+  | "isWeightModalOpen"
+  | "isPaymentModalOpen"
+  | "isCustomizeModalOpen"
+  | "isNewOrderModalOpen"
+  | "isActionModalOpen"
+  | "isProductDetailsOpen"
+  | "isCategoryOpen"
+>;
+
 export interface UseSalesUIOptions extends BaseHookOptions {
   initialState?: Partial<SalesUIState>;
   autoReset?: boolean;
@@ -38,18 +49,7 @@ export interface SalesUIActions {
   openProductDetails: (product: Product) => void;
   openCategoryModal: (category: string) => void;
   closeAllModals: () => void;
-  closeModal: (
-    modalName: keyof Pick<
-      SalesUIState,
-      | "isWeightModalOpen"
-      | "isPaymentModalOpen"
-      | "isCustomizeModalOpen"
-      | "isNewOrderModalOpen"
-      | "isActionModalOpen"
-      | "isProductDetailsOpen"
-      | "isCategoryOpen"
-    >
-  ) => void;
+  closeModal: (modalName: ModalStateKey) => void;
   selectCategory: (category: string | null) => void;
   selectProduct: (product: Product | null) => void;
   selectOrder: (orderId: string | null) => void;
@@ -176,18 +176,7 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
   );
 
   const getModalResetUpdates = useCallback(
-    (
-      modalName: keyof Pick<
-        SalesUIState,
-        | "isWeightModalOpen"
-        | "isPaymentModalOpen"
-        | "isCustomizeModalOpen"
-        | "isNewOrderModalOpen"
-        | "isActionModalOpen"
-        | "isProductDetailsOpen"
-        | "isCategoryOpen"
-      >
-    ): Partial<SalesUIState> => {
+    (modalName: ModalStateKey): Partial<SalesUIState> => {
       const resetMap: Record<string, Partial<SalesUIState>> = {
         isWeightModalOpen: {
           selectedProduct: null,
@@ -214,18 +203,7 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
   );
 
   const closeModal = useCallback(
-    (
-      modalName: keyof Pick<
-        SalesUIState,
-        | "isWeightModalOpen"
-        | "isPaymentModalOpen"
-        | "isCustomizeModalOpen"
-        | "isNewOrderModalOpen"
-        | "isActionModalOpen"
-        | "isProductDetailsOpen"
-        | "isCategoryOpen"
-      >
-    ) => {
+    (modalName: ModalStateKey) => {
       const updates: Partial<SalesUIState> = {
         [modalName]: false,
       };
@@ -337,19 +315,7 @@ export function useSalesUI(options: UseSalesUIOptions = {}): UseSalesUIReturn {
     [updateState]
   );
 
-  const modalStateMap: Record<
-    keyof Pick<
-      SalesUIState,
-      | "isWeightModalOpen"
-      | "isPaymentModalOpen"
-      | "isCustomizeModalOpen"
-      | "isNewOrderModalOpen"
-      | "isActionModalOpen"
-      | "isProductDetailsOpen"
-      | "isCategoryOpen"
-    >,
-    string
-  > = useMemo(
+  const modalStateMap: Record<ModalStateKey, string> = useMemo(
     () => ({
       isWeightModalOpen: "weight",
       isPaymentModalOpen: "payment",
