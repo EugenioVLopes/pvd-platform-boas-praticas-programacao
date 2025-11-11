@@ -77,12 +77,12 @@ export interface UseErrorHandlerReturn {
  * ```
  */
 export function useErrorHandler(hookName: string): UseErrorHandlerReturn {
-  const [error, setErrorState] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const setError = useCallback(
+  const setErrorHandler = useCallback(
     (error: HookError) => {
       const errorMessage = normalizeError(error, `Erro em ${hookName}`);
-      setErrorState(errorMessage);
+      setError(errorMessage);
 
       if (process.env.NODE_ENV === "development") {
         console.error(`[${hookName}] Erro:`, error);
@@ -92,7 +92,7 @@ export function useErrorHandler(hookName: string): UseErrorHandlerReturn {
   );
 
   const clearError = useCallback(() => {
-    setErrorState(null);
+    setError(null);
   }, []);
 
   const handleAsyncError = useCallback(
@@ -106,11 +106,11 @@ export function useErrorHandler(hookName: string): UseErrorHandlerReturn {
           hookName,
           err
         );
-        setError(hookError);
+        setErrorHandler(hookError);
         return null;
       }
     },
-    [hookName, setError, clearError]
+    [hookName, setErrorHandler, clearError]
   );
 
   const withErrorHandling = useCallback(
@@ -125,17 +125,17 @@ export function useErrorHandler(hookName: string): UseErrorHandlerReturn {
             hookName,
             err
           );
-          setError(hookError);
+          setErrorHandler(hookError);
           return null;
         }
       }) as T;
     },
-    [hookName, setError, clearError]
+    [hookName, setErrorHandler, clearError]
   );
 
   return {
     error,
-    setError,
+    setError: setErrorHandler,
     clearError,
     handleAsyncError,
     withErrorHandling,

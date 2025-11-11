@@ -100,38 +100,38 @@ export function useMobile(options: UseMobileOptions = {}): UseMobileReturn {
       return;
     }
 
-    const initialWidth = window.innerWidth;
+    const initialWidth = globalThis.innerWidth;
     updateDeviceType(initialWidth);
 
-    const mobileQuery = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
-    const tabletQuery = window.matchMedia(
+    const mobileQuery = globalThis.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const tabletQuery = globalThis.matchMedia(
       `(min-width: ${breakpoint}px) and (max-width: ${tabletBreakpoint - 1}px)`
     );
-    const desktopQuery = window.matchMedia(
+    const desktopQuery = globalThis.matchMedia(
       `(min-width: ${tabletBreakpoint}px)`
     );
 
     const handleResize = () => {
-      updateDeviceType(window.innerWidth);
+      updateDeviceType(globalThis.innerWidth);
     };
 
-    window.addEventListener("resize", handleResize);
+    globalThis.addEventListener("resize", handleResize);
 
     const handleMobileChange = () => {
       if (mobileQuery.matches) {
-        updateDeviceType(window.innerWidth);
+        updateDeviceType(globalThis.innerWidth);
       }
     };
 
     const handleTabletChange = () => {
       if (tabletQuery.matches) {
-        updateDeviceType(window.innerWidth);
+        updateDeviceType(globalThis.innerWidth);
       }
     };
 
     const handleDesktopChange = () => {
       if (desktopQuery.matches) {
-        updateDeviceType(window.innerWidth);
+        updateDeviceType(globalThis.innerWidth);
       }
     };
 
@@ -140,7 +140,7 @@ export function useMobile(options: UseMobileOptions = {}): UseMobileReturn {
     desktopQuery.addEventListener("change", handleDesktopChange);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      globalThis.removeEventListener("resize", handleResize);
       mobileQuery.removeEventListener("change", handleMobileChange);
       tabletQuery.removeEventListener("change", handleTabletChange);
       desktopQuery.removeEventListener("change", handleDesktopChange);
