@@ -171,9 +171,11 @@ export class CartUtils {
       errors.push(productError);
     }
 
-    errors.push(...this.validateWeight(item, config));
-    errors.push(...this.validateQuantity(item, config));
-    errors.push(...this.validateCustomValidators(item, config));
+    errors.push(
+      ...this.validateWeight(item, config),
+      ...this.validateQuantity(item, config),
+      ...this.validateCustomValidators(item, config)
+    );
 
     if (item.product?.price === 0) {
       warnings.push("Produto com preço zero");
@@ -225,11 +227,11 @@ export class CartUtils {
 
     const sortedByPrice = itemTotals.toSorted((a, b) => a.total - b.total);
     const cheapestItem = sortedByPrice[0]?.item;
-    const mostExpensiveItem = sortedByPrice[sortedByPrice.length - 1]?.item;
+    const mostExpensiveItem = sortedByPrice.at(-1)?.item;
 
     const categories = Array.from(
       new Set(items.map((item) => item.product?.category).filter(Boolean))
-    ) as string[];
+    );
 
     return {
       uniqueItems: items.length,

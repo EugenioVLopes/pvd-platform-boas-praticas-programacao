@@ -103,7 +103,9 @@ export function useMobile(options: UseMobileOptions = {}): UseMobileReturn {
     const initialWidth = globalThis.innerWidth;
     updateDeviceType(initialWidth);
 
-    const mobileQuery = globalThis.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    const mobileQuery = globalThis.matchMedia(
+      `(max-width: ${breakpoint - 1}px)`
+    );
     const tabletQuery = globalThis.matchMedia(
       `(min-width: ${breakpoint}px) and (max-width: ${tabletBreakpoint - 1}px)`
     );
