@@ -1,17 +1,17 @@
 import { useCallback, useMemo } from "react";
 
-import { formatCurrency } from "@/lib";
+import type { Product, SaleItem } from "@/features/products";
+import { useProducts } from "@/features/products";
+import type { Order, PaymentMethod } from "@/features/sales";
 import {
+  useCart,
   useOrders,
   useSales,
-  useCart,
   useSalesUI,
   type CompleteSaleData,
 } from "@/features/sales";
-import { useProducts } from "@/features/products";
 import { useToast } from "@/hooks";
-import type { Order, PaymentMethod } from "@/features/sales";
-import type { Product, SaleItem } from "@/features/products";
+import { formatCurrency } from "@/lib";
 
 export function useSalesProcessing() {
   const { products } = useProducts();
@@ -132,9 +132,14 @@ export function useSalesProcessing() {
         );
         const change = cashAmount ? cashAmount - total : 0;
 
+        const changeText = cashAmount
+          ? `. Troco: ${formatCurrency(change)}`
+          : "";
+        const description = `Venda finalizada para ${customerName}. Total: ${formatCurrency(total)}${changeText}`;
+
         toast({
           title: "Venda Finalizada",
-          description: `Venda finalizada para ${customerName}. Total: ${formatCurrency(total)}${cashAmount ? `. Troco: ${formatCurrency(change)}` : ""}`,
+          description,
         });
       } catch (error) {
         const errorMessage =

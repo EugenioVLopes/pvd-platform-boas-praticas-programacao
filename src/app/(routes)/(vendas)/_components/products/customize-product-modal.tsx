@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useProducts, Product } from "@/features/products";
+import { Product, useProducts } from "@/features/products";
 
 interface CustomizeProductModalProps {
   isOpen: boolean;
@@ -136,6 +136,24 @@ export function CustomizeProductModal({
 
   const isCategoryFull = (category: keyof typeof selectedOptions) => {
     return getSelectedCount(category) >= getMaxAllowed(category);
+  };
+
+  const getCommandItemClassName = (
+    isSelected: boolean,
+    isDisabled: boolean
+  ) => {
+    const baseClasses =
+      "flex cursor-pointer items-center justify-between rounded-md px-3 py-2 transition-colors";
+
+    if (isSelected) {
+      return `${baseClasses} bg-primary/10 font-medium text-primary`;
+    }
+
+    if (isDisabled) {
+      return `${baseClasses} cursor-not-allowed opacity-50`;
+    }
+
+    return `${baseClasses} hover:bg-accent`;
   };
 
   return (
@@ -260,13 +278,10 @@ export function CustomizeProductModal({
                               )
                             }
                             disabled={isDisabled}
-                            className={`flex cursor-pointer items-center justify-between rounded-md px-3 py-2 transition-colors ${
-                              isSelected
-                                ? "bg-primary/10 font-medium text-primary"
-                                : isDisabled
-                                  ? "cursor-not-allowed opacity-50"
-                                  : "hover:bg-accent"
-                            }`}
+                            className={getCommandItemClassName(
+                              isSelected,
+                              isDisabled
+                            )}
                           >
                             <span className="text-sm">{option.name}</span>
                             {isSelected && (
@@ -323,13 +338,10 @@ export function CustomizeProductModal({
                               )
                             }
                             disabled={isDisabled}
-                            className={`flex cursor-pointer items-center justify-between rounded-md px-3 py-2 transition-colors ${
-                              isSelected
-                                ? "bg-primary/10 font-medium text-primary"
-                                : isDisabled
-                                  ? "cursor-not-allowed opacity-50"
-                                  : "hover:bg-accent"
-                            }`}
+                            className={getCommandItemClassName(
+                              isSelected,
+                              isDisabled
+                            )}
                           >
                             <span className="text-sm">{option.name}</span>
                             {isSelected && (
@@ -388,13 +400,10 @@ export function CustomizeProductModal({
                               )
                             }
                             disabled={isDisabled}
-                            className={`flex cursor-pointer items-center justify-between rounded-md px-3 py-2 transition-colors ${
-                              isSelected
-                                ? "bg-primary/10 font-medium text-primary"
-                                : isDisabled
-                                  ? "cursor-not-allowed opacity-50"
-                                  : "hover:bg-accent"
-                            }`}
+                            className={getCommandItemClassName(
+                              isSelected,
+                              isDisabled
+                            )}
                           >
                             <span className="text-sm">{option.name}</span>
                             {isSelected && (
