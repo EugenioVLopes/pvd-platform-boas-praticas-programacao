@@ -112,7 +112,7 @@ export function useOrders(options: UseOrdersOptions = {}): UseOrdersReturn {
   const [error, setError] = useState<string | null>(null);
 
   const storage = useMemo(() => {
-    if (typeof window === "undefined") return null;
+    if (typeof globalThis.window === "undefined") return null;
     return storageType === "localStorage" ? localStorage : sessionStorage;
   }, [storageType]);
 
