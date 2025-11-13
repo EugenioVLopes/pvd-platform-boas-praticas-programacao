@@ -2,13 +2,12 @@ import { useCallback, useMemo } from "react";
 
 import type { Product, SaleItem } from "@/features/products";
 import { useProducts } from "@/features/products";
-import type { Order, PaymentMethod } from "@/features/sales";
+import type { CompleteSaleData, Order, PaymentMethod } from "@/features/sales";
 import {
   useCart,
   useOrders,
   useSales,
   useSalesUI,
-  type CompleteSaleData,
 } from "@/features/sales";
 import { useToast } from "@/hooks";
 import { formatCurrency } from "@/lib";
