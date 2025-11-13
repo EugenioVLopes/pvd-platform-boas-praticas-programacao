@@ -264,7 +264,8 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
       errors.push(`Carrinho excede o limite de ${maxItems} itens`);
     }
 
-    for (const [index, item] of items.entries()) {
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
       if (!item.product) {
         errors.push(`Item ${index + 1}: Produto inválido`);
       }

@@ -78,18 +78,18 @@ export function SalesProcessing() {
       )}
 
       <main className="min-h-[500px]">
-        {!uiState.showProducts ? (
-          <ProductCategories
-            categories={getAvailableCategories()}
-            selectedCategory={uiState.selectedCategory}
-            onSelectCategory={handleCategorySelect}
-          />
-        ) : (
+        {uiState.showProducts ? (
           <ProductList
             products={products.filter(
               (p) => p.category === uiState.selectedCategory
             )}
             onProductSelect={handleProductSelect}
+          />
+        ) : (
+          <ProductCategories
+            categories={getAvailableCategories()}
+            selectedCategory={uiState.selectedCategory}
+            onSelectCategory={handleCategorySelect}
           />
         )}
 
