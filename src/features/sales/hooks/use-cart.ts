@@ -264,7 +264,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
       errors.push(`Carrinho excede o limite de ${maxItems} itens`);
     }
 
-    items.forEach((item, index) => {
+    for (const [index, item] of items.entries()) {
       if (!item.product) {
         errors.push(`Item ${index + 1}: Produto inválido`);
       }
@@ -281,7 +281,7 @@ export function useCart(options: UseCartOptions = {}): UseCartReturn {
       if (item.quantity && item.quantity <= 0) {
         errors.push(`Item ${index + 1}: Quantidade deve ser maior que zero`);
       }
-    });
+    }
 
     return {
       isValid: errors.length === 0,
