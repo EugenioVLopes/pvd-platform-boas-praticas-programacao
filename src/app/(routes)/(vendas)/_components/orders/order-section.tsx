@@ -3,10 +3,13 @@ import { Calendar, Package, Printer, Trash2, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { formatCurrency } from "@/lib";
-import { generateOrderPrintTemplate, printHtmlContent } from "@/features/sales";
-import { Order } from "@/features/sales";
 import { SaleItem } from "@/features/products";
+import {
+  generateOrderPrintTemplate,
+  Order,
+  printHtmlContent,
+} from "@/features/sales";
+import { formatCurrency } from "@/lib";
 
 import { OrderItemsTable } from "./order-items-table";
 
