@@ -1,8 +1,7 @@
 "use client";
 
 import { AuthGuard } from "@/features/auth";
-import { useProducts } from "@/features/products";
-import { Product } from "@/features/products";
+import { Product, useProducts } from "@/features/products";
 
 import { AddProductForm } from "./_components/add-product-form";
 import { ProductList } from "./_components/product-list";

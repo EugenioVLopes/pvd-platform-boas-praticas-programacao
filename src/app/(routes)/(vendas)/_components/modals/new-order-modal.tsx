@@ -15,9 +15,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface NewOrderModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: (customerName: string) => void;
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly onConfirm: (customerName: string) => void;
 }
 
 export function NewOrderModal({

@@ -13,8 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { useProducts, Product } from "@/features/products";
-import { SaleItem } from "@/features/products";
+import { Product, SaleItem, useProducts } from "@/features/products";
 
 interface OrderItemRowProps {
   item: SaleItem;
