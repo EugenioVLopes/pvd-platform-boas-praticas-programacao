@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { BaseHookOptions, PersistenceOptions } from "@/types";
 import type { Order } from "@/features/sales";
+import { BaseHookOptions, PersistenceOptions } from "@/types";
 
 const DEFAULT_STORAGE_KEY = "orders";
 
@@ -27,77 +27,6 @@ export interface UseOrdersReturn {
   clearError: () => void;
 }
 
-/**
- * Hook para gerenciar pedidos com persistência local e otimizações de performance
- *
- * @param options - Opções de configuração do hook
- * @param options.enabled - Se o hook deve estar ativo
- * @param options.persistToStorage - Se deve persistir no storage
- * @param options.storageKey - Chave para armazenamento
- * @param options.storageType - Tipo de storage a usar
- * @param options.validateOrders - Se deve validar pedidos
- *
- * @returns Objeto com estado e ações para gerenciar pedidos
- *
- * @example
- * ```tsx
- * function OrdersPage() {
- *   const {
- *     orders,
- *     addOrder,
- *     updateOrder,
- *     loading,
- *     error,
- *     totalValue
- *   } = useOrders({
- *     persistToStorage: true,
- *     storageKey: "my-orders"
- *   });
- *
- *   if (loading) return <Loading />;
- *   if (error) return <Error message={error} />;
- *
- *   return (
- *     <div>
- *       <h2>Total: R$ {totalValue.toFixed(2)}</h2>
- *       {orders.map(order => (
- *         <OrderCard
- *           key={order.id}
- *           order={order}
- *           onUpdate={(updates) => updateOrder(order.id, updates)}
- *         />
- *       ))}
- *     </div>
- *   );
- * }
- * ```
- *
- * @example
- * ```tsx
- * // Uso com validação customizada
- * function ValidatedOrders() {
- *   const { addOrder, error } = useOrders({
- *     validateOrders: true,
- *     storageType: "sessionStorage"
- *   });
- *
- *   const handleAddOrder = () => {
- *     addOrder({
- *       customerName: "João Silva",
- *       items: [],
- *       status: "open"
- *     });
- *   };
- *
- *   return (
- *     <div>
- *       <button onClick={handleAddOrder}>Add Order</button>
- *       {error && <p className="error">{error}</p>}
- *     </div>
- *   );
- * }
- * ```
- */
 export function useOrders(options: UseOrdersOptions = {}): UseOrdersReturn {
   const {
     enabled = true,
@@ -112,7 +41,7 @@ export function useOrders(options: UseOrdersOptions = {}): UseOrdersReturn {
   const [error, setError] = useState<string | null>(null);
 
   const storage = useMemo(() => {
-    if (typeof globalThis.window === "undefined") return null;
+    if (globalThis.window === undefined) return null;
     return storageType === "localStorage" ? localStorage : sessionStorage;
   }, [storageType]);
 
@@ -229,7 +158,7 @@ export function useOrders(options: UseOrdersOptions = {}): UseOrdersReturn {
 
   const updateOrder = useCallback(
     (id: string, updates: Partial<Order>) => {
-      const validationError = validateOrder(updates, true); // true = atualização parcial
+      const validationError = validateOrder(updates, true);
       if (validationError) {
         setError(validationError);
         return;
