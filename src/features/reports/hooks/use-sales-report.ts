@@ -1,7 +1,4 @@
-import {
-  calculateSalesReport,
-  getDateRangeForReportType,
-} from "@/features/reports";
+import { calculateSalesReport } from "@/features/reports";
 import type { Order, SalesReport } from "@/features/sales";
 import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";
@@ -56,25 +53,4 @@ export function useSalesReport({
     totalItems,
     filteredOrders,
   };
-}
-
-export function useSalesMetrics({ orders, dateRange }: UseSalesReportProps) {
-  const { totalSales, totalRevenue, averageTicket, totalItems } =
-    useSalesReport({
-      orders,
-      dateRange,
-    });
-
-  return {
-    totalSales,
-    totalRevenue,
-    averageTicket,
-    totalItems,
-  };
-}
-
-export function useReportDateRange(reportType: "daily" | "weekly" | "monthly") {
-  return useMemo(() => {
-    return getDateRangeForReportType(reportType);
-  }, [reportType]);
 }

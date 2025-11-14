@@ -11,12 +11,5 @@ export const PRODUCT_CATEGORIES = {
   OUTROS: "Outros",
 } as const;
 
-export const PAYMENT_METHODS = {
-  CREDIT: "CREDIT",
-  DEBIT: "DEBIT",
-  CASH: "CASH",
-  PIX: "PIX",
-} as const;
-
 export type ProductCategory =
   (typeof PRODUCT_CATEGORIES)[keyof typeof PRODUCT_CATEGORIES];

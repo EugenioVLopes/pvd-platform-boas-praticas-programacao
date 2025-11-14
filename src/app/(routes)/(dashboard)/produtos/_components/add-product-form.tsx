@@ -20,11 +20,11 @@ interface NewProductData {
   type: string;
 }
 
-interface AddProductFormProps {
+export function AddProductForm({
+  onAddProduct,
+}: {
   onAddProduct: (product: Omit<Product, "id">) => void;
-}
-
-export function AddProductForm({ onAddProduct }: AddProductFormProps) {
+}) {
   const [newProduct, setNewProduct] = useState<NewProductData>({
     name: "",
     price: "",
