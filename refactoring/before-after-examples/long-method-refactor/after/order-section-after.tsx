@@ -1,10 +1,13 @@
 import { Printer, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { SaleItem } from "@/features/products";
+import {
+  Order,
+  generateOrderPrintTemplate,
+  printHtmlContent,
+} from "@/features/sales";
 import { formatCurrency } from "@/lib";
-import { generateOrderPrintTemplate, printHtmlContent } from "@/features/sales";
-import { Order } from "@/features/sales";
-import { Product, SaleItem } from "@/features/products";
 
 // import { OrderItemsTable } from "./order-items-table"; // Comentado para documentação
 
