@@ -1,4 +1,4 @@
-import { Calendar, Package, Printer, Trash2, User } from "lucide-react";
+import { Calendar, Package, Plus, Printer, Trash2, User } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +23,7 @@ interface OrderSectionProps {
   onRemoveItem: (orderId: string, itemIndex: number) => void;
   onFinalize: () => void;
   onDelete: () => void;
+  onAddProducts: () => void;
   calculateOrderTotal: (order: Order) => number;
 }
 
@@ -32,6 +33,7 @@ export function OrderSection({
   onRemoveItem,
   onFinalize,
   onDelete,
+  onAddProducts,
   calculateOrderTotal,
 }: OrderSectionProps) {
   const handlePrint = () => {
@@ -96,6 +98,15 @@ export function OrderSection({
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              size="sm"
+              variant="default"
+              onClick={onAddProducts}
+              className="flex w-full items-center justify-center gap-2 bg-primary hover:bg-primary/90 sm:w-auto"
+            >
+              <Plus className="h-4 w-4" />
+              Adicionar Produto
+            </Button>
             <Button
               size="sm"
               variant="outline"

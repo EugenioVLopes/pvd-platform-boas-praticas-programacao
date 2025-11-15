@@ -3,12 +3,7 @@ import { useCallback, useMemo } from "react";
 import type { Product, SaleItem } from "@/features/products";
 import { useProducts } from "@/features/products";
 import type { CompleteSaleData, Order, PaymentMethod } from "@/features/sales";
-import {
-  useCart,
-  useOrders,
-  useSales,
-  useSalesUI,
-} from "@/features/sales";
+import { useCart, useOrders, useSales, useSalesUI } from "@/features/sales";
 import { useToast } from "@/hooks";
 import { formatCurrency } from "@/lib";
 
@@ -43,6 +38,33 @@ export function useSalesProcessing() {
 
   const handleProductSelect = useCallback(
     (product: Product) => {
+      if (uiState.currentOrderId) {
+        const order = orders.find((o) => o.id === uiState.currentOrderId);
+        if (order) {
+          if (product.type === "weight") {
+            uiActions.openWeightModal(product);
+          } else if (product.options) {
+            uiActions.openCustomizeModal(product);
+          } else {
+            const newItem: SaleItem = {
+              product,
+              quantity: 1,
+            };
+            updateOrder(order.id, {
+              items: [...order.items, newItem],
+            });
+            toast({
+              title: "Produto Adicionado",
+              description: `${product.name} adicionado à comanda`,
+            });
+            uiActions.setShowProducts(false);
+            uiActions.selectCategory(null);
+          }
+          return;
+        }
+      }
+
+      // Caso contrário, adicionar ao carrinho temporário
       if (product.type === "weight") {
         uiActions.openWeightModal(product);
       } else if (product.options) {
@@ -53,19 +75,48 @@ export function useSalesProcessing() {
         uiActions.selectCategory(null);
       }
     },
-    [addItem, uiActions]
+    [addItem, uiActions, uiState.currentOrderId, orders, updateOrder, toast]
   );
 
   const handleWeightConfirm = useCallback(
     (weight: number) => {
       if (uiState.selectedProduct) {
+        if (uiState.currentOrderId) {
+          const order = orders.find((o) => o.id === uiState.currentOrderId);
+          if (order) {
+            const newItem: SaleItem = {
+              product: uiState.selectedProduct,
+              quantity: 1,
+              weight,
+            };
+            updateOrder(order.id, {
+              items: [...order.items, newItem],
+            });
+            toast({
+              title: "Produto Adicionado",
+              description: `${uiState.selectedProduct.name} adicionado à comanda`,
+            });
+            uiActions.closeModal("isWeightModalOpen");
+            uiActions.setShowProducts(false);
+            uiActions.selectCategory(null);
+            return;
+          }
+        }
         addItem(uiState.selectedProduct, { quantity: 1, weight });
       }
       uiActions.closeModal("isWeightModalOpen");
       uiActions.setShowProducts(false);
       uiActions.selectCategory(null);
     },
-    [uiState.selectedProduct, addItem, uiActions]
+    [
+      uiState.selectedProduct,
+      uiState.currentOrderId,
+      orders,
+      updateOrder,
+      addItem,
+      uiActions,
+      toast,
+    ]
   );
 
   const handleCustomizeConfirm = useCallback(
@@ -78,6 +129,28 @@ export function useSalesProcessing() {
       addons: Product[] = []
     ) => {
       if (uiState.selectedProduct) {
+        if (uiState.currentOrderId) {
+          const order = orders.find((o) => o.id === uiState.currentOrderId);
+          if (order) {
+            const newItem: SaleItem = {
+              product: uiState.selectedProduct,
+              quantity: 1,
+              addons,
+              selectedOptions,
+            };
+            updateOrder(order.id, {
+              items: [...order.items, newItem],
+            });
+            toast({
+              title: "Produto Adicionado",
+              description: `${uiState.selectedProduct.name} adicionado à comanda`,
+            });
+            uiActions.closeModal("isCustomizeModalOpen");
+            uiActions.setShowProducts(false);
+            uiActions.selectCategory(null);
+            return;
+          }
+        }
         addItem(uiState.selectedProduct, {
           quantity: 1,
           addons,
@@ -93,7 +166,15 @@ export function useSalesProcessing() {
       uiActions.setShowProducts(false);
       uiActions.selectCategory(null);
     },
-    [uiState.selectedProduct, addItem, uiActions]
+    [
+      uiState.selectedProduct,
+      uiState.currentOrderId,
+      orders,
+      updateOrder,
+      addItem,
+      uiActions,
+      toast,
+    ]
   );
 
   const handlePayment = useCallback(

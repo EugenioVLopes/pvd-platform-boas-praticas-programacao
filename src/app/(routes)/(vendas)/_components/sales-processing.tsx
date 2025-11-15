@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 
+import { Button } from "@/components/ui/button";
 import { useSalesProcessing } from "@/features/sales";
 import { PRODUCT_CATEGORIES, ProductCategory } from "@/lib/constants";
 import { calculateItemTotal } from "@/lib";
@@ -73,36 +74,73 @@ export function SalesProcessing() {
               uiActions.selectOrder(null);
             }
           }}
+          onAddProducts={() => {
+            uiActions.setShowProducts(true);
+          }}
           calculateOrderTotal={calculateOrderTotal}
         />
       )}
 
-      <main className="min-h-[500px]">
-        {uiState.showProducts ? (
-          <ProductList
-            products={products.filter(
-              (p) => p.category === uiState.selectedCategory
-            )}
-            onProductSelect={handleProductSelect}
-          />
-        ) : (
-          <ProductCategories
-            categories={getAvailableCategories()}
-            selectedCategory={uiState.selectedCategory}
-            onSelectCategory={handleCategorySelect}
-          />
-        )}
+      {!currentOrder && (
+        <main className="min-h-[500px]">
+          {uiState.showProducts ? (
+            <ProductList
+              products={products.filter(
+                (p) => p.category === uiState.selectedCategory
+              )}
+              onProductSelect={handleProductSelect}
+            />
+          ) : (
+            <ProductCategories
+              categories={getAvailableCategories()}
+              selectedCategory={uiState.selectedCategory}
+              onSelectCategory={handleCategorySelect}
+            />
+          )}
 
-        {temporaryItems.length > 0 && (
-          <CartSection
-            items={temporaryItems}
-            onRemoveItem={handleRemoveFromCart}
-            onUpdateItem={handleUpdateCartItem}
-            onProceed={() => uiActions.openActionModal()}
-            hasOpenOrders={orders.length > 0}
-          />
-        )}
-      </main>
+          {temporaryItems.length > 0 && (
+            <CartSection
+              items={temporaryItems}
+              onRemoveItem={handleRemoveFromCart}
+              onUpdateItem={handleUpdateCartItem}
+              onProceed={() => uiActions.openActionModal()}
+              hasOpenOrders={orders.length > 0}
+            />
+          )}
+        </main>
+      )}
+
+      {currentOrder && uiState.showProducts && (
+        <main className="min-h-[500px]">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold">
+              Adicionar Produtos à Comanda
+            </h2>
+            <Button
+              variant="outline"
+              onClick={() => {
+                uiActions.setShowProducts(false);
+              }}
+            >
+              Voltar para Comanda
+            </Button>
+          </div>
+          {uiState.selectedCategory ? (
+            <ProductList
+              products={products.filter(
+                (p) => p.category === uiState.selectedCategory
+              )}
+              onProductSelect={handleProductSelect}
+            />
+          ) : (
+            <ProductCategories
+              categories={getAvailableCategories()}
+              selectedCategory={uiState.selectedCategory}
+              onSelectCategory={handleCategorySelect}
+            />
+          )}
+        </main>
+      )}
 
       <WeightInputModal
         isOpen={uiState.isWeightModalOpen}
