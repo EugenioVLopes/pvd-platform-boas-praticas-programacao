@@ -2,12 +2,15 @@
 import { useState } from "react";
 import type { DateRange } from "react-day-picker";
 
-import { useSales } from "@/features/sales";
-import { useSalesReport, getDateRangeForReportType } from "@/features/reports";
 import { AuthGuard } from "@/features/auth";
-import { SalesReportHeader } from "./_components/dashboard-header";
-import { SalesReportMetrics } from "./_components/dashboard-metrics";
-import { SalesReportTabs } from "./_components/dashboard-tabs";
+import {
+  SalesReportHeader,
+  SalesReportMetrics,
+  SalesReportTabs,
+  getDateRangeForReportType,
+  useSalesReport,
+} from "@/features/reports";
+import { useSales } from "@/features/sales";
 
 export default function DashboardPage() {
   const { completedSales } = useSales();

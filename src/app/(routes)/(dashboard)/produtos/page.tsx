@@ -1,10 +1,12 @@
 "use client";
 
 import { AuthGuard } from "@/features/auth";
-import { Product, useProducts } from "@/features/products";
-
-import { AddProductForm } from "./_components/add-product-form";
-import { ProductList } from "./_components/product-list";
+import {
+  AddProductForm,
+  Product,
+  ProductList,
+  useProducts,
+} from "@/features/products";
 
 export default function ProductsPage() {
   const { products, addProduct } = useProducts();

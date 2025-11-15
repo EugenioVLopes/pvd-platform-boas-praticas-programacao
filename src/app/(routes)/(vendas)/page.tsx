@@ -1,6 +1,6 @@
 "use client";
 
-import { SalesProcessing } from "./_components/sales-processing";
+import { SalesProcessing } from "@/features/sales";
 
 export default function VendasPage() {
   return <SalesProcessing />;

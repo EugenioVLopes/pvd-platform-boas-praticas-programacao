@@ -1,7 +1,7 @@
 "use client";
 
-import { SalesProcessing } from "@/app/(routes)/(vendas)/_components/sales-processing";
 import { AuthGuard } from "@/features/auth";
+import { SalesProcessing } from "@/features/sales";
 
 export default function HomePage() {
   return (
