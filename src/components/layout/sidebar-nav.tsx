@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import * as React from "react";
 
 import {
@@ -18,13 +19,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { cn } from "@/lib";
 
 interface NavItem {
   title: string;
   url: string;
   icon?: LucideIcon;
-  color?: string;
-  isActive?: boolean;
+  iconColor?: string;
+  exactMatch?: boolean;
 }
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -36,30 +38,42 @@ const defaultItems: NavItem[] = [
     title: "Vendas",
     url: "/",
     icon: ShoppingCart,
-    color: "text-sky-500",
+    iconColor: "text-sky-500",
+    exactMatch: true,
   },
   {
     title: "Produtos",
     url: "/produtos",
     icon: Package,
-    color: "text-violet-500",
+    iconColor: "text-violet-500",
   },
   {
     title: "Relatórios",
     url: "/sales-report",
     icon: BarChart3,
-    color: "text-pink-700",
+    iconColor: "text-pink-700",
   },
   {
     title: "Configurações",
     url: "/configuracoes",
     icon: Settings,
-    color: "text-orange-700",
+    iconColor: "text-orange-700",
   },
 ];
 
+function isRouteActive(
+  pathname: string,
+  itemUrl: string,
+  exactMatch?: boolean
+): boolean {
+  if (exactMatch) {
+    return pathname === itemUrl;
+  }
+  return pathname === itemUrl || pathname.startsWith(`${itemUrl}/`);
+}
+
 export function MainSidebar({ items = defaultItems, ...props }: SidebarProps) {
-  const [activeItem, setActiveItem] = React.useState("/");
+  const pathname = usePathname();
 
   return (
     <Sidebar
@@ -91,20 +105,33 @@ export function MainSidebar({ items = defaultItems, ...props }: SidebarProps) {
       <SidebarContent className="px-2 py-4">
         <SidebarMenu className="space-y-1">
           {items.map((item) => {
-            const isActive = activeItem === item.url;
+            const isActive = isRouteActive(pathname, item.url, item.exactMatch);
+
             return (
               <Link
-                key={item.title}
+                key={item.url}
                 href={item.url}
-                onClick={() => setActiveItem(item.url)}
+                aria-current={isActive ? "page" : undefined}
+                aria-label={item.title}
               >
                 <SidebarMenuButton
-                  className={`w-full justify-start rounded-lg px-3 py-2.5 transition-all duration-200 hover:bg-pink-200/70 ${isActive ? "bg-pink-100 font-medium text-accent-foreground" : ""} group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-3`}
+                  isActive={isActive}
                   tooltip={item.title}
+                  className={cn(
+                    "w-full justify-start rounded-lg px-3 py-2.5 transition-all duration-200",
+                    "group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-3"
+                  )}
                 >
                   {item.icon && (
                     <item.icon
-                      className={`mr-3 h-5 w-5 ${item.color} ${isActive ? "opacity-100" : "opacity-80"} group-data-[collapsible=icon]:mr-0`}
+                      className={cn(
+                        "h-5 w-5 shrink-0 transition-opacity",
+                        item.iconColor,
+                        isActive ? "opacity-100" : "opacity-80",
+                        "group-data-[collapsible=icon]:mr-0",
+                        "mr-3"
+                      )}
+                      aria-hidden="true"
                     />
                   )}
                   <span className="truncate text-sm group-data-[collapsible=icon]:hidden">
