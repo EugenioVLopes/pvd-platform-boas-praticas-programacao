@@ -23,7 +23,7 @@ jest.mock("next/navigation", () => ({
 }));
 
 // Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
+Object.defineProperty(globalThis, "matchMedia", {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,
@@ -38,12 +38,9 @@ Object.defineProperty(window, "matchMedia", {
 });
 
 // Mock IntersectionObserver
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  takeRecords() {
-    return [];
-  }
-  unobserve() {}
+globalThis.IntersectionObserver = class IntersectionObserver {
+  disconnect = jest.fn();
+  observe = jest.fn();
+  takeRecords = jest.fn(() => []);
+  unobserve = jest.fn();
 } as unknown as typeof IntersectionObserver;

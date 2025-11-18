@@ -9,7 +9,7 @@ describe("formatCurrency", () => {
     const result = formatCurrency(value);
 
     // ASSERT - Normalize spaces (Intl uses non-breaking space)
-    expect(result.replace(/\u00A0/g, " ")).toBe("R$ 1.234,56");
+    expect(result.replaceAll("\u00A0", " ")).toBe("R$ 1.234,56");
   });
 
   test("should format zero correctly", () => {
@@ -20,7 +20,7 @@ describe("formatCurrency", () => {
     const result = formatCurrency(value);
 
     // ASSERT - Normalize spaces
-    expect(result.replace(/\u00A0/g, " ")).toBe("R$ 0,00");
+    expect(result.replaceAll("\u00A0", " ")).toBe("R$ 0,00");
   });
 
   test("should format negative number correctly", () => {
@@ -31,7 +31,7 @@ describe("formatCurrency", () => {
     const result = formatCurrency(value);
 
     // ASSERT - Normalize spaces
-    expect(result.replace(/\u00A0/g, " ")).toBe("-R$ 100,50");
+    expect(result.replaceAll("\u00A0", " ")).toBe("-R$ 100,50");
   });
 });
 
