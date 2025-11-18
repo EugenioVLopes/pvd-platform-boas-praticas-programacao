@@ -22,9 +22,9 @@ interface NewProductData {
 
 export function AddProductForm({
   onAddProduct,
-}: {
+}: Readonly<{
   onAddProduct: (product: Omit<Product, "id">) => void;
-}) {
+}>) {
   const [newProduct, setNewProduct] = useState<NewProductData>({
     name: "",
     price: "",

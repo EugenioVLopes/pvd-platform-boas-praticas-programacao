@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Product } from "@/features/products";
 
 interface AddonsBadgeProps {
-  addons: Product[];
+  readonly addons: Product[];
 }
 
 export function AddonsBadge({ addons }: AddonsBadgeProps) {
@@ -25,4 +25,3 @@ export function AddonsBadge({ addons }: AddonsBadgeProps) {
     </Badge>
   );
 }
-

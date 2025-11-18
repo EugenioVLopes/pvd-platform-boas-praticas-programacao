@@ -44,7 +44,7 @@ export function OrderItemRow({ item, onRemove, onUpdate }: OrderItemRowProps) {
     setSelectedAddons((prev) =>
       prev.some((a) => a.id === product.id)
         ? prev.filter((a) => a.id !== product.id)
-        : [...prev, { ...product, price: 2.0 }]
+        : [...prev, { ...product, price: 2 }]
     );
   };
 

@@ -2,10 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Product } from "@/features/products";
 
 interface ProductButtonProps {
-  product: Product;
-  isSelected: boolean;
-  onToggle: () => void;
-  priceOverride?: number;
+  readonly product: Product;
+  readonly isSelected: boolean;
+  readonly onToggle: () => void;
+  readonly priceOverride?: number;
 }
 
 export function ProductButton({
@@ -16,11 +16,15 @@ export function ProductButton({
 }: ProductButtonProps) {
   const price = priceOverride ?? product.price;
   const displayPrice = priceOverride ? "2,00" : price.toFixed(2);
-  const bgColor = isSelected
-    ? priceOverride
+
+  let bgColor: string;
+  if (isSelected) {
+    bgColor = priceOverride
       ? "bg-pink-500 text-black hover:bg-pink-600"
-      : "bg-pink-300 text-white hover:bg-pink-600"
-    : "bg-white hover:bg-gray-50";
+      : "bg-pink-300 text-white hover:bg-pink-600";
+  } else {
+    bgColor = "bg-white hover:bg-gray-50";
+  }
 
   return (
     <Button
@@ -33,4 +37,3 @@ export function ProductButton({
     </Button>
   );
 }
-

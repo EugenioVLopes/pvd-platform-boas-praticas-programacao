@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { SaleItem } from "@/features/products";
 
 interface SelectedOptionsBadgesProps {
-  selectedOptions: SaleItem["selectedOptions"];
+  readonly selectedOptions: SaleItem["selectedOptions"];
 }
 
 export function SelectedOptionsBadges({

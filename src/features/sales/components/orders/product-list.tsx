@@ -3,11 +3,11 @@ import { Product } from "@/features/products";
 import { ProductButton } from "./product-button";
 
 interface ProductListProps {
-  title: string;
-  products: Product[];
-  selectedAddons: Product[];
-  onToggle: (product: Product) => void;
-  priceOverride?: number;
+  readonly title: string;
+  readonly products: Product[];
+  readonly selectedAddons: Product[];
+  readonly onToggle: (product: Product) => void;
+  readonly priceOverride?: number;
 }
 
 export function ProductList({
@@ -39,4 +39,3 @@ export function ProductList({
     </div>
   );
 }
-

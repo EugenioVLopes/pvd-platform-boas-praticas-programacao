@@ -9,14 +9,14 @@ import { Product } from "@/features/products";
 import { ProductList } from "./product-list";
 
 interface AddonDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  adicionais: Product[];
-  acompanhamentos: Product[];
-  selectedAddons: Product[];
-  onToggleAddon: (product: Product) => void;
-  onToggleAcompanhamento: (product: Product) => void;
-  onConfirm: () => void;
+  readonly open: boolean;
+  readonly onOpenChange: (open: boolean) => void;
+  readonly adicionais: Product[];
+  readonly acompanhamentos: Product[];
+  readonly selectedAddons: Product[];
+  readonly onToggleAddon: (product: Product) => void;
+  readonly onToggleAcompanhamento: (product: Product) => void;
+  readonly onConfirm: () => void;
 }
 
 export function AddonDialog({
@@ -49,7 +49,7 @@ export function AddonDialog({
             products={acompanhamentos}
             selectedAddons={selectedAddons}
             onToggle={onToggleAcompanhamento}
-            priceOverride={2.0}
+            priceOverride={2}
           />
         </div>
         <div className="mt-4 flex justify-end gap-2">
@@ -72,4 +72,3 @@ export function AddonDialog({
     </Dialog>
   );
 }
-
