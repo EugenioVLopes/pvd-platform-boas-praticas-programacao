@@ -54,7 +54,7 @@ describe("getCategories", () => {
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBeGreaterThan(0);
     // Verificar que não há duplicatas
-    const uniqueCategories = [...new Set(result)];
+    const uniqueCategories = Array.from(new Set(result));
     expect(uniqueCategories.length).toBe(result.length);
   });
 

@@ -605,7 +605,6 @@ describe("getDateRangeForReportType", () => {
     jest.setSystemTime(now);
 
     // ACT
-    // @ts-expect-error - Testing invalid type
     const result = getDateRangeForReportType("invalid" as any);
 
     // ASSERT

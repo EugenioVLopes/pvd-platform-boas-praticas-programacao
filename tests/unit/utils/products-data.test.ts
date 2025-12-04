@@ -1,8 +1,8 @@
 import {
-  getProductsByCategory,
   getCategories,
-  searchProducts,
   getProductById,
+  getProductsByCategory,
+  searchProducts,
 } from "@/lib/constants/products-data";
 
 describe("getProductsByCategory", () => {
@@ -53,9 +53,9 @@ describe("getCategories", () => {
     // ASSERT
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBeGreaterThan(0);
-    
+
     // Verificar que são únicas
-    const uniqueCategories = [...new Set(result)];
+    const uniqueCategories = Array.from(new Set(result));
     expect(result.length).toBe(uniqueCategories.length);
   });
 
@@ -77,7 +77,7 @@ describe("getCategories", () => {
     // ASSERT - Verificar se categorias comuns existem
     const hasSorvetes = result.includes("Sorvetes");
     const hasAcai = result.includes("Açaí");
-    
+
     // Pelo menos uma dessas categorias deve existir
     expect(hasSorvetes || hasAcai).toBe(true);
   });
@@ -193,4 +193,3 @@ describe("getProductById", () => {
     }
   });
 });
-
