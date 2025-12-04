@@ -1,6 +1,6 @@
 // Learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom";
-import { webcrypto } from "crypto";
+import { webcrypto } from "node:crypto";
 
 if (!globalThis.crypto) {
   Object.defineProperty(globalThis, "crypto", {
@@ -14,7 +14,7 @@ if (!globalThis.crypto) {
 }
 
 class MemoryStorage implements Storage {
-  private store = new Map<string, string>();
+  private readonly store = new Map<string, string>();
 
   get length() {
     return this.store.size;

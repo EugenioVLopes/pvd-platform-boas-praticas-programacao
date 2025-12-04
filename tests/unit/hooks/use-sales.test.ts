@@ -1,5 +1,8 @@
 import { useSales } from "@/features/sales/hooks/use-sales";
-import { createMockSaleItem, createMockWeightSaleItem } from "@/tests/fixtures/products";
+import {
+  createMockSaleItem,
+  createMockWeightSaleItem,
+} from "@/tests/fixtures/products";
 import { createMockCompleteSaleData } from "@/tests/fixtures/sales";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
@@ -341,11 +344,8 @@ describe("useSales", () => {
     });
 
     // ACT
-    let loadingDuringProcess = false;
     const promise = act(async () => {
       const salePromise = result.current.completeSale(saleData);
-      // Verificar loading imediatamente após iniciar
-      loadingDuringProcess = result.current.loading;
       await salePromise;
     });
 
