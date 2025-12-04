@@ -6,19 +6,20 @@ import {
 } from "@/tests/fixtures/auth";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-// Mock do setTimeout para acelerar testes
-jest.useFakeTimers();
-
 describe("Auth", () => {
+  beforeAll(() => {
+    // Mock do setTimeout para acelerar testes
+    jest.useFakeTimers();
+  });
+
+  afterAll(() => {
+    // Restaurar timers reais após todos os testes
+    jest.useRealTimers();
+  });
+
   beforeEach(() => {
     mockOnLogin.mockClear();
     jest.clearAllTimers();
-  });
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
-    jest.useFakeTimers();
   });
 
   test("should render password input and submit button", () => {

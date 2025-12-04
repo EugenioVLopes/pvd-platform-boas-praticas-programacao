@@ -1,5 +1,11 @@
 import { AddProductForm } from "@/features/products/components/add-product-form";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 
 // Mock do useProducts
 jest.mock("@/features/products/hooks/use-products", () => ({
@@ -71,7 +77,9 @@ describe("AddProductForm", () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    submitButton.click();
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
 
     // ASSERT
     await waitFor(() => {
@@ -148,7 +156,9 @@ describe("AddProductForm", () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    submitButton.click();
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
 
     // ASSERT
     await waitFor(() => {
@@ -179,7 +189,9 @@ describe("AddProductForm", () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    submitButton.click();
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
 
     // ASSERT
     await waitFor(() => {
