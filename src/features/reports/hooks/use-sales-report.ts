@@ -1,4 +1,4 @@
-import { calculateSalesReport } from "@/features/reports";
+import { calculateSalesReport } from "@/features/reports/lib/reports";
 import type { Order, SalesReport } from "@/features/sales";
 import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";
