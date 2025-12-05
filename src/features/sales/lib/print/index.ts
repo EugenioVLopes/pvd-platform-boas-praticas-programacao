@@ -1,12 +1,30 @@
-import type { Order } from "@/features/sales";
 import type { SaleItem } from "@/features/products";
+import type { Order } from "@/features/sales";
 
 function formatOrderItem(item: SaleItem): string {
+  const renderFrutasHtml = (): string => {
+    return item.selectedOptions?.frutas.length > 0
+      ? `<div style="font-size: 0.875rem;">Frutas: ${item.selectedOptions.frutas.join(", ")}</div>`
+      : "";
+  };
+
+  const renderCremesHtml = (): string => {
+    return item.selectedOptions?.cremes.length > 0
+      ? `<div style="font-size: 0.875rem;">Cremes: ${item.selectedOptions.cremes.join(", ")}</div>`
+      : "";
+  };
+
+  const renderAcompanhamentosHtml = (): string => {
+    return item.selectedOptions?.acompanhamentos.length > 0
+      ? `<div style="font-size: 0.875rem;">Acomp: ${item.selectedOptions.acompanhamentos.join(", ")}</div>`
+      : "";
+  };
+
   const optionsHtml = item.selectedOptions
     ? `
-      ${item.selectedOptions.frutas.length > 0 ? `<div style="font-size: 0.875rem;">Frutas: ${item.selectedOptions.frutas.join(", ")}</div>` : ""}
-      ${item.selectedOptions.cremes.length > 0 ? `<div style="font-size: 0.875rem;">Cremes: ${item.selectedOptions.cremes.join(", ")}</div>` : ""}
-      ${item.selectedOptions.acompanhamentos.length > 0 ? `<div style="font-size: 0.875rem;">Acomp: ${item.selectedOptions.acompanhamentos.join(", ")}</div>` : ""}
+      ${renderFrutasHtml()}
+      ${renderCremesHtml()}
+      ${renderAcompanhamentosHtml()}
     `
     : "";
 

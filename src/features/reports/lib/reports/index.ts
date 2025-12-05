@@ -151,20 +151,19 @@ export function getDateRangeForReportType(
 
   switch (type) {
     case "daily":
-      from = startOfToday;
+    case "monthly":
+    default:
+      from =
+        type === "monthly"
+          ? new Date(startOfToday.getFullYear(), startOfToday.getMonth(), 1)
+          : startOfToday;
+      if (type === "monthly") {
+        from.setHours(0, 0, 0, 0);
+      }
       to = endOfToday;
       break;
     case "weekly":
       from = getStartOfWeek(startOfToday);
-      to = endOfToday;
-      break;
-    case "monthly":
-      from = new Date(startOfToday.getFullYear(), startOfToday.getMonth(), 1);
-      from.setHours(0, 0, 0, 0);
-      to = endOfToday;
-      break;
-    default:
-      from = startOfToday;
       to = endOfToday;
       break;
   }

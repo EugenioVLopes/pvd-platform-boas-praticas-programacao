@@ -11,10 +11,9 @@ export const AuthLoading = memo(function AuthLoading({
   message = "Verificando autenticação...",
 }: AuthLoadingProps) {
   return (
-    <div
+    <output
       className="flex items-center justify-center"
       style={{ minHeight }}
-      role="status"
       aria-live="polite"
       aria-label={message}
     >
@@ -28,7 +27,7 @@ export const AuthLoading = memo(function AuthLoading({
         />
         <span className="sr-only">{message}</span>
       </div>
-    </div>
+    </output>
   );
 });
 

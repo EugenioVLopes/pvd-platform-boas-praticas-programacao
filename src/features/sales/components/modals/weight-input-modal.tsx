@@ -33,7 +33,7 @@ export function WeightInputModal({
   const handleConfirm = () => {
     setError(null);
     const weightValue = Number.parseFloat(weight);
-    if (!isNaN(weightValue) && weightValue > 0) {
+    if (!Number.isNaN(weightValue) && weightValue > 0) {
       onConfirm(weightValue);
       setWeight("");
       setError(null);

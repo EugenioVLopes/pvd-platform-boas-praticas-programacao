@@ -35,7 +35,7 @@ export function SalesReportHeader({
         <DateRangePicker
           value={dateRange}
           onChange={(range) =>
-            range && range.from && range.to && onDateRangeChange(range)
+            range?.from && range?.to && onDateRangeChange(range)
           }
           className="w-full rounded-lg bg-white shadow-sm md:w-auto"
         />

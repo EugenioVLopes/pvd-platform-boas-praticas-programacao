@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatCurrency } from "@/lib";
 import type { PaymentMethod } from "@/features/sales";
+import { formatCurrency } from "@/lib";
 
 interface PaymentMethodSelectionProps {
   isOpen: boolean;
@@ -86,7 +86,7 @@ export function PaymentMethodSelection({
 
   const validateAdjustedTotal = (value: string) => {
     const parsed = Number.parseFloat(value);
-    if (isNaN(parsed) || parsed <= 0) {
+    if (Number.isNaN(parsed) || parsed <= 0) {
       setError("Por favor, insira um valor válido maior que zero.");
       return false;
     }
@@ -116,7 +116,7 @@ export function PaymentMethodSelection({
 
   const validateCashAmount = (amount: string, total: number): boolean => {
     const parsedAmount = Number.parseFloat(amount);
-    if (isNaN(parsedAmount)) {
+    if (Number.isNaN(parsedAmount)) {
       setError("Por favor, insira um valor válido.");
       return false;
     }
@@ -147,7 +147,10 @@ export function PaymentMethodSelection({
 
   const calculaTroco = (): number => {
     const valorRecebido = Number.parseFloat(cashAmount);
-    if (!isNaN(valorRecebido) && valorRecebido >= Number(adjustedTotal)) {
+    if (
+      !Number.isNaN(valorRecebido) &&
+      valorRecebido >= Number(adjustedTotal)
+    ) {
       return valorRecebido - Number(adjustedTotal);
     }
     return 0;
@@ -155,7 +158,7 @@ export function PaymentMethodSelection({
 
   const isValidCashAmount =
     selectedMethod === "CASH"
-      ? !isNaN(Number(cashAmount)) &&
+      ? !Number.isNaN(Number(cashAmount)) &&
         Number(cashAmount) >= Number(adjustedTotal)
       : true;
 

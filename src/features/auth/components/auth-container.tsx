@@ -16,10 +16,9 @@ export const AuthContainer = memo(function AuthContainer({
   error,
 }: AuthContainerProps) {
   return (
-    <div
+    <main
       className="flex items-center justify-center"
       style={{ minHeight }}
-      role="main"
       aria-labelledby="auth-title"
     >
       <div className="w-full max-w-sm space-y-4">
@@ -41,7 +40,7 @@ export const AuthContainer = memo(function AuthContainer({
 
         <Auth onLogin={onLogin} />
       </div>
-    </div>
+    </main>
   );
 });
 
