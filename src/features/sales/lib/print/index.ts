@@ -3,20 +3,23 @@ import type { Order } from "@/features/sales";
 
 function formatOrderItem(item: SaleItem): string {
   const renderFrutasHtml = (): string => {
-    return item.selectedOptions?.frutas.length > 0
-      ? `<div style="font-size: 0.875rem;">Frutas: ${item.selectedOptions.frutas.join(", ")}</div>`
+    const frutas = item.selectedOptions?.frutas;
+    return frutas && frutas.length > 0
+      ? `<div style="font-size: 0.875rem;">Frutas: ${frutas.join(", ")}</div>`
       : "";
   };
 
   const renderCremesHtml = (): string => {
-    return item.selectedOptions?.cremes.length > 0
-      ? `<div style="font-size: 0.875rem;">Cremes: ${item.selectedOptions.cremes.join(", ")}</div>`
+    const cremes = item.selectedOptions?.cremes;
+    return cremes && cremes.length > 0
+      ? `<div style="font-size: 0.875rem;">Cremes: ${cremes.join(", ")}</div>`
       : "";
   };
 
   const renderAcompanhamentosHtml = (): string => {
-    return item.selectedOptions?.acompanhamentos.length > 0
-      ? `<div style="font-size: 0.875rem;">Acomp: ${item.selectedOptions.acompanhamentos.join(", ")}</div>`
+    const acompanhamentos = item.selectedOptions?.acompanhamentos;
+    return acompanhamentos && acompanhamentos.length > 0
+      ? `<div style="font-size: 0.875rem;">Acomp: ${acompanhamentos.join(", ")}</div>`
       : "";
   };
 
