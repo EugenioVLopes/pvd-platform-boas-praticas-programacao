@@ -4,7 +4,7 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 
 // Mock crypto.randomUUID
 const mockUUID = "test-uuid-123";
-Object.defineProperty(global, "crypto", {
+Object.defineProperty(globalThis, "crypto", {
   value: {
     randomUUID: jest.fn(() => mockUUID),
   },
@@ -25,8 +25,8 @@ const createMockStorage = () => {
 const mockLocalStorage = createMockStorage();
 const mockSessionStorage = createMockStorage();
 
-Object.defineProperty(window, "localStorage", { value: mockLocalStorage });
-Object.defineProperty(window, "sessionStorage", { value: mockSessionStorage });
+Object.defineProperty(globalThis, "localStorage", { value: mockLocalStorage });
+Object.defineProperty(globalThis, "sessionStorage", { value: mockSessionStorage });
 
 // Silenciar console.error durante os testes (erros esperados)
 const originalConsoleError = console.error;
@@ -96,7 +96,7 @@ describe("useOrders", () => {
           items: [{ product: mockProducts[0], quantity: 2 }],
           status: "open",
           paymentMethod: "PIX",
-          total: 9.0,
+          total: 9,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         },
@@ -539,14 +539,14 @@ describe("useOrders", () => {
           items: [createMockSaleItem({ quantity: 1 })],
           status: "completed",
           paymentMethod: "CASH",
-          total: 10.0,
+          total: 10,
         });
       });
 
       // Como crypto.randomUUID é mocado para retornar sempre o mesmo valor,
       // vou adicionar outro pedido e verificar se o mock foi chamado de novo
       const secondMockUUID = "test-uuid-456";
-      (global.crypto.randomUUID as jest.Mock).mockReturnValueOnce(
+      (globalThis.crypto.randomUUID as jest.Mock).mockReturnValueOnce(
         secondMockUUID
       );
 
@@ -556,12 +556,12 @@ describe("useOrders", () => {
           items: [createMockSaleItem({ quantity: 2 })],
           status: "completed",
           paymentMethod: "PIX",
-          total: 20.0,
+          total: 20,
         });
       });
 
       // ASSERT
-      expect(result.current.totalValue).toBe(30.0);
+      expect(result.current.totalValue).toBe(30);
     });
 
     test("deve calcular total baseado em items quando total não está definido", async () => {
@@ -582,7 +582,7 @@ describe("useOrders", () => {
       });
 
       // ASSERT - Quando total é 0, usa o cálculo dos items
-      expect(result.current.totalValue).toBe(9.0);
+      expect(result.current.totalValue).toBe(9);
     });
   });
 

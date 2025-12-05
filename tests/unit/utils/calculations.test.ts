@@ -27,7 +27,7 @@ describe("calculateItemTotal", () => {
     const result = calculateItemTotal(item);
 
     // ASSERT
-    expect(result).toBe(9.0);
+    expect(result).toBe(9);
   });
 
   test("should calculate total for unit product without quantity (defaults to 1)", () => {
@@ -87,7 +87,7 @@ describe("calculateItemTotal", () => {
     const result = calculateItemTotal(item);
 
     // ASSERT
-    expect(result).toBe(47.0); // 47 * 1
+    expect(result).toBe(47); // 47 * 1
   });
 
   test("should calculate total for item with addons", () => {
@@ -105,14 +105,14 @@ describe("calculateItemTotal", () => {
         {
           id: 69,
           name: "Creme de Cookies",
-          price: 3.0,
+          price: 3,
           category: "Adicionais",
           type: "addon",
         },
         {
           id: 70,
           name: "Nutella",
-          price: 3.0,
+          price: 3,
           category: "Adicionais",
           type: "addon",
         },
@@ -123,10 +123,10 @@ describe("calculateItemTotal", () => {
     const result = calculateItemTotal(item);
 
     // ASSERT
-    // Base: 4.5 * 2 = 9.0
-    // Addons: (3.0 + 3.0) * 2 = 12.0
-    // Total: 9.0 + 12.0 = 21.0
-    expect(result).toBe(21.0);
+    // Base: 4.5 * 2 = 9
+    // Addons: (3 + 3) * 2 = 12
+    // Total: 9 + 12 = 21
+    expect(result).toBe(21);
   });
 
   test("should calculate total for item with addons and no quantity (defaults to 1)", () => {
@@ -144,7 +144,7 @@ describe("calculateItemTotal", () => {
         {
           id: 69,
           name: "Creme de Cookies",
-          price: 3.0,
+          price: 3,
           category: "Adicionais",
           type: "addon",
         },
@@ -156,8 +156,8 @@ describe("calculateItemTotal", () => {
 
     // ASSERT
     // Base: 4.5 * 1 = 4.5
-    // Addons: 3.0 * 1 = 3.0
-    // Total: 4.5 + 3.0 = 7.5
+    // Addons: 3 * 1 = 3
+    // Total: 4.5 + 3 = 7.5
     expect(result).toBe(7.5);
   });
 
@@ -242,7 +242,7 @@ describe("calculateItemTotal", () => {
 
     // ASSERT
     // Se não tem weight, usa quantity: 47 * 2 = 94
-    expect(result).toBe(94.0);
+    expect(result).toBe(94);
   });
 });
 
@@ -257,7 +257,7 @@ describe("calculateOrderTotal", () => {
     const result = calculateOrderTotal(order);
 
     // ASSERT
-    expect(result).toBe(9.0); // 4.5 * 2
+    expect(result).toBe(9); // 4.5 * 2
   });
 
   test("should calculate total for order with multiple items", () => {
@@ -273,9 +273,9 @@ describe("calculateOrderTotal", () => {
     const result = calculateOrderTotal(order);
 
     // ASSERT
-    // Item 1: 4.5 * 2 = 9.0
+    // Item 1: 4.5 * 2 = 9
     // Item 2: 4.5 * 3 = 13.5
-    // Total: 9.0 + 13.5 = 22.5
+    // Total: 9 + 13.5 = 22.5
     expect(result).toBe(22.5);
   });
 
@@ -294,8 +294,8 @@ describe("calculateOrderTotal", () => {
     // ASSERT
     // Weight item: 47 * 0.5 = 23.5
     // Unit item: 4.5 * 1 = 4.5
-    // Total: 23.5 + 4.5 = 28.0
-    expect(result).toBe(28.0);
+    // Total: 23.5 + 4.5 = 28
+    expect(result).toBe(28);
   });
 
   test("should calculate total for order with items and addons", () => {
@@ -308,7 +308,7 @@ describe("calculateOrderTotal", () => {
             {
               id: 69,
               name: "Creme de Cookies",
-              price: 3.0,
+              price: 3,
               category: "Adicionais",
               type: "addon",
             },
@@ -321,10 +321,10 @@ describe("calculateOrderTotal", () => {
     const result = calculateOrderTotal(order);
 
     // ASSERT
-    // Base: 4.5 * 2 = 9.0
-    // Addons: 3.0 * 2 = 6.0
-    // Total: 9.0 + 6.0 = 15.0
-    expect(result).toBe(15.0);
+    // Base: 4.5 * 2 = 9
+    // Addons: 3 * 2 = 6
+    // Total: 9 + 6 = 15
+    expect(result).toBe(15);
   });
 
   test("should return zero for empty order", () => {

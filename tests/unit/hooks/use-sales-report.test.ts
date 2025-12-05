@@ -33,15 +33,15 @@ describe("useSalesReport", () => {
     const orders = [
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T10:00:00"),
-        total: 9.0,
+        total: 9,
       }),
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T11:00:00"),
-        total: 47.0,
+        total: 47,
       }),
       createMockOrder({
         finalizadaEm: new Date("2024-01-16T10:00:00"), // Fora do range
-        total: 18.0,
+        total: 18,
       }),
     ];
 
@@ -55,8 +55,8 @@ describe("useSalesReport", () => {
 
     // ASSERT
     expect(result.current.totalSales).toBe(2);
-    expect(result.current.totalRevenue).toBe(56.0); // 9.0 + 47.0
-    expect(result.current.averageTicket).toBe(28.0); // 56.0 / 2
+    expect(result.current.totalRevenue).toBe(56); // 9 + 47
+    expect(result.current.averageTicket).toBe(28); // 56 / 2
     expect(result.current.filteredOrders.length).toBe(2);
   });
 
@@ -94,17 +94,17 @@ describe("useSalesReport", () => {
     const orders = [
       createMockOrder({
         paymentMethod: "CASH",
-        total: 10.0,
+        total: 10,
         finalizadaEm: new Date("2024-01-15T10:00:00"),
       }),
       createMockOrder({
         paymentMethod: "PIX",
-        total: 20.0,
+        total: 20,
         finalizadaEm: new Date("2024-01-15T11:00:00"),
       }),
       createMockOrder({
         paymentMethod: "CASH",
-        total: 15.0,
+        total: 15,
         finalizadaEm: new Date("2024-01-15T12:00:00"),
       }),
     ];
@@ -118,8 +118,8 @@ describe("useSalesReport", () => {
     const { result } = renderHook(() => useSalesReport({ orders, dateRange }));
 
     // ASSERT
-    expect(result.current.salesByPaymentMethod.CASH).toBe(25.0); // 10.0 + 15.0
-    expect(result.current.salesByPaymentMethod.PIX).toBe(20.0);
+    expect(result.current.salesByPaymentMethod.CASH).toBe(25); // 10 + 15
+    expect(result.current.salesByPaymentMethod.PIX).toBe(20);
   });
 
   test("should calculate sales by category", () => {
@@ -217,15 +217,15 @@ describe("useSalesReport", () => {
     // ARRANGE
     const orders = [
       createMockOrder({
-        total: 10.0,
+        total: 10,
         finalizadaEm: new Date("2024-01-15T10:00:00"),
       }),
       createMockOrder({
-        total: 20.0,
+        total: 20,
         finalizadaEm: new Date("2024-01-15T10:30:00"),
       }),
       createMockOrder({
-        total: 15.0,
+        total: 15,
         finalizadaEm: new Date("2024-01-15T14:00:00"),
       }),
     ];
@@ -239,8 +239,8 @@ describe("useSalesReport", () => {
     const { result } = renderHook(() => useSalesReport({ orders, dateRange }));
 
     // ASSERT
-    expect(result.current.salesByHour[10]).toBe(30.0); // 10.0 + 20.0
-    expect(result.current.salesByHour[14]).toBe(15.0);
+    expect(result.current.salesByHour[10]).toBe(30); // 10 + 20
+    expect(result.current.salesByHour[14]).toBe(15);
   });
 
   test("should use createdAt when finalizadaEm is not available", () => {
@@ -249,7 +249,7 @@ describe("useSalesReport", () => {
       createMockOrder({
         finalizadaEm: undefined,
         createdAt: new Date("2024-01-15T10:00:00"),
-        total: 10.0,
+        total: 10,
       }),
     ];
 
@@ -271,7 +271,7 @@ describe("useSalesReport", () => {
     const initialOrders = [
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T10:00:00"),
-        total: 10.0,
+        total: 10,
       }),
     ];
 
@@ -295,7 +295,7 @@ describe("useSalesReport", () => {
       ...initialOrders,
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T11:00:00"),
-        total: 20.0,
+        total: 20,
       }),
     ];
 
@@ -303,7 +303,7 @@ describe("useSalesReport", () => {
 
     // ASSERT
     expect(result.current.totalSales).toBe(2);
-    expect(result.current.totalRevenue).toBe(30.0);
+    expect(result.current.totalRevenue).toBe(30);
   });
 
   test("should recalculate when date range changes", () => {
@@ -311,11 +311,11 @@ describe("useSalesReport", () => {
     const orders = [
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T10:00:00"),
-        total: 10.0,
+        total: 10,
       }),
       createMockOrder({
         finalizadaEm: new Date("2024-01-16T10:00:00"),
-        total: 20.0,
+        total: 20,
       }),
     ];
 
@@ -344,6 +344,6 @@ describe("useSalesReport", () => {
 
     // ASSERT
     expect(result.current.totalSales).toBe(1);
-    expect(result.current.totalRevenue).toBe(20.0);
+    expect(result.current.totalRevenue).toBe(20);
   });
 });

@@ -210,7 +210,7 @@ describe("getProductById", () => {
 
   test("should return correct product for last ID", () => {
     // ARRANGE
-    const lastProduct = INITIAL_PRODUCTS[INITIAL_PRODUCTS.length - 1];
+    const lastProduct = INITIAL_PRODUCTS.at(-1);
     if (!lastProduct) {
       throw new Error("No products available");
     }

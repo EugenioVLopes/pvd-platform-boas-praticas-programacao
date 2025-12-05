@@ -13,10 +13,10 @@ jest.mock("zustand/middleware", () => ({
 
 // Mock do crypto.randomUUID
 const mockRandomUUID = jest.fn(() => "test-uuid-123");
-global.crypto = {
-  ...global.crypto,
+globalThis.crypto = {
+  ...globalThis.crypto,
   randomUUID: mockRandomUUID,
-} as typeof global.crypto;
+} as typeof globalThis.crypto;
 
 describe("useSales", () => {
   beforeEach(() => {
@@ -47,7 +47,7 @@ describe("useSales", () => {
       customerName: "Cliente Teste",
       items: [createMockSaleItem({ quantity: 2 })],
       paymentMethod: "CASH",
-      cashAmount: 20.0,
+      cashAmount: 20,
     });
 
     // ACT
@@ -179,7 +179,7 @@ describe("useSales", () => {
       customerName: "Cliente Teste",
       items: [createMockSaleItem({ quantity: 2 })], // Total: 9.0
       paymentMethod: "CASH",
-      cashAmount: 5.0, // Menor que o total
+      cashAmount: 5, // Menor que o total
     });
 
     // ACT & ASSERT
@@ -201,8 +201,8 @@ describe("useSales", () => {
       customerName: "Cliente Teste",
       items: [createMockSaleItem({ quantity: 2 })], // Total: 9.0
       paymentMethod: "CASH",
-      discount: 2.0, // Desconto de 2.0
-      cashAmount: 10.0,
+      discount: 2, // Desconto de 2
+      cashAmount: 10,
     });
 
     // ACT
@@ -216,8 +216,8 @@ describe("useSales", () => {
     });
 
     const completedSale = result.current.completedSales[0];
-    // Total: 9.0 - 2.0 = 7.0
-    expect(completedSale.total).toBe(7.0);
+    // Total: 9 - 2 = 7
+    expect(completedSale.total).toBe(7);
   });
 
   test("should calculate change correctly", async () => {
@@ -227,7 +227,7 @@ describe("useSales", () => {
       customerName: "Cliente Teste",
       items: [createMockSaleItem({ quantity: 2 })], // Total: 9.0
       paymentMethod: "CASH",
-      cashAmount: 20.0, // Troco: 20.0 - 9.0 = 11.0
+      cashAmount: 20, // Troco: 20 - 9 = 11
     });
 
     // ACT
@@ -241,7 +241,7 @@ describe("useSales", () => {
     });
 
     const completedSale = result.current.completedSales[0];
-    expect(completedSale.change).toBe(11.0);
+    expect(completedSale.change).toBe(11);
   });
 
   test("should get sale by id", async () => {
@@ -366,7 +366,7 @@ describe("useSales", () => {
       customerName: "Cliente Teste",
       items: [createMockWeightSaleItem({ weight: 500 })], // 500g = 0.5kg
       paymentMethod: "CASH",
-      cashAmount: 30.0,
+      cashAmount: 30,
     });
 
     // ACT

@@ -78,9 +78,9 @@ describe("calculateSalesMetrics", () => {
   test("should calculate metrics correctly", () => {
     // ARRANGE
     const orders = [
-      createMockOrder({ total: 10.0 }),
-      createMockOrder({ total: 20.0 }),
-      createMockOrder({ total: 30.0 }),
+      createMockOrder({ total: 10 }),
+      createMockOrder({ total: 20 }),
+      createMockOrder({ total: 30 }),
     ];
 
     // ACT
@@ -88,8 +88,8 @@ describe("calculateSalesMetrics", () => {
 
     // ASSERT
     expect(result.totalSales).toBe(3);
-    expect(result.totalRevenue).toBe(60.0);
-    expect(result.averageTicket).toBe(20.0);
+    expect(result.totalRevenue).toBe(60);
+    expect(result.averageTicket).toBe(20);
     expect(result.totalItems).toBeGreaterThan(0);
   });
 
@@ -130,28 +130,28 @@ describe("groupSalesByPaymentMethod", () => {
   test("should group sales by payment method", () => {
     // ARRANGE
     const orders = [
-      createMockOrder({ paymentMethod: "CASH", total: 10.0 }),
-      createMockOrder({ paymentMethod: "PIX", total: 20.0 }),
-      createMockOrder({ paymentMethod: "CASH", total: 15.0 }),
+      createMockOrder({ paymentMethod: "CASH", total: 10 }),
+      createMockOrder({ paymentMethod: "PIX", total: 20 }),
+      createMockOrder({ paymentMethod: "CASH", total: 15 }),
     ];
 
     // ACT
     const result = groupSalesByPaymentMethod(orders);
 
     // ASSERT
-    expect(result.CASH).toBe(25.0);
-    expect(result.PIX).toBe(20.0);
+    expect(result.CASH).toBe(25);
+    expect(result.PIX).toBe(20);
   });
 
   test("should handle orders without payment method", () => {
     // ARRANGE
-    const orders = [createMockOrder({ paymentMethod: undefined, total: 10.0 })];
+    const orders = [createMockOrder({ paymentMethod: undefined, total: 10 })];
 
     // ACT
     const result = groupSalesByPaymentMethod(orders);
 
     // ASSERT
-    expect(result.outros).toBe(10.0);
+    expect(result.outros).toBe(10);
   });
 });
 
@@ -200,15 +200,15 @@ describe("groupSalesByHour", () => {
     const orders = [
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T10:30:00"),
-        total: 10.0,
+        total: 10,
       }),
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T10:45:00"),
-        total: 20.0,
+        total: 20,
       }),
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T14:00:00"),
-        total: 15.0,
+        total: 15,
       }),
     ];
 
@@ -216,8 +216,8 @@ describe("groupSalesByHour", () => {
     const result = groupSalesByHour(orders);
 
     // ASSERT
-    expect(result[10]).toBe(30.0);
-    expect(result[14]).toBe(15.0);
+    expect(result[10]).toBe(30);
+    expect(result[14]).toBe(15);
   });
 
   test("should use createdAt when finalizadaEm is not available", () => {
@@ -226,7 +226,7 @@ describe("groupSalesByHour", () => {
       createMockOrder({
         finalizadaEm: undefined,
         createdAt: new Date("2024-01-15T16:00:00"),
-        total: 10.0,
+        total: 10,
       }),
     ];
 
@@ -234,7 +234,7 @@ describe("groupSalesByHour", () => {
     const result = groupSalesByHour(orders);
 
     // ASSERT
-    expect(result[16]).toBe(10.0);
+    expect(result[16]).toBe(10);
   });
 });
 
@@ -330,7 +330,7 @@ describe("calculateSalesReport", () => {
     const orders = [
       createMockOrder({
         finalizadaEm: new Date("2024-01-15T10:00:00"),
-        total: 10.0,
+        total: 10,
         paymentMethod: "CASH",
         items: [
           createMockSaleItem({
@@ -352,9 +352,9 @@ describe("calculateSalesReport", () => {
 
     // ASSERT
     expect(result.totalSales).toBe(1);
-    expect(result.totalRevenue).toBe(10.0);
-    expect(result.averageTicket).toBe(10.0);
-    expect(result.salesByPaymentMethod.CASH).toBe(10.0);
+    expect(result.totalRevenue).toBe(10);
+    expect(result.averageTicket).toBe(10);
+    expect(result.salesByPaymentMethod.CASH).toBe(10);
     expect(result.topProducts.length).toBeGreaterThan(0);
   });
 

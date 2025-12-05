@@ -12,7 +12,7 @@ const mockSessionStorage = {
   length: 0,
 };
 
-Object.defineProperty(window, "sessionStorage", { value: mockSessionStorage });
+Object.defineProperty(globalThis, "sessionStorage", { value: mockSessionStorage });
 
 describe("useCart", () => {
   beforeEach(() => {
@@ -366,14 +366,14 @@ describe("useCart", () => {
         result.current.addItem(mockProducts[0], {
           quantity: 2,
           addons: [mockAddons[0]], // Creme de Cookies - 3.0
-        }); // Base: 4.5 * 2 = 9.0, Addon: 3.0 * 2 = 6.0, Total: 15.0
+        }); // Base: 4.5 * 2 = 9, Addon: 3 * 2 = 6, Total: 15
       });
 
       // ACT
       const total = result.current.getItemTotal(result.current.items[0]);
 
       // ASSERT
-      expect(total).toBe(15.0);
+      expect(total).toBe(15);
     });
 
     test("deve retornar 0 para produto sem preço", () => {
@@ -732,7 +732,7 @@ describe("useCart", () => {
       });
 
       // ASSERT
-      expect(result.current.totalValue).toBe(9.0);
+      expect(result.current.totalValue).toBe(9);
     });
   });
 });
