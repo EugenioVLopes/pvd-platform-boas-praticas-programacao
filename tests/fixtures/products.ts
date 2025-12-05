@@ -28,7 +28,7 @@ export const mockProducts: Product[] = [
   {
     id: 4,
     name: "Monte do Seu Jeito 200ml",
-    price: 12.0,
+    price: 12,
     category: "Monte do Seu Jeito",
     type: "unit",
     options: {
@@ -43,14 +43,14 @@ export const mockAddons: Product[] = [
   {
     id: 69,
     name: "Creme de Cookies",
-    price: 3.0,
+    price: 3,
     category: "Adicionais",
     type: "addon",
   },
   {
     id: 70,
     name: "Nutella",
-    price: 3.0,
+    price: 3,
     category: "Adicionais",
     type: "addon",
   },
@@ -70,7 +70,7 @@ export function createMockProduct(overrides?: Partial<Product>): Product {
   return {
     id: 999,
     name: "Produto Teste",
-    price: 10.0,
+    price: 10,
     category: "Teste",
     type: "unit",
     ...overrides,
