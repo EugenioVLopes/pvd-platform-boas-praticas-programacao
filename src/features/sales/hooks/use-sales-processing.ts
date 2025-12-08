@@ -156,11 +156,6 @@ export function useSalesProcessing() {
           addons,
           selectedOptions,
         });
-        console.log("Item adicionado:", {
-          product: uiState.selectedProduct.name,
-          addons,
-          selectedOptions,
-        });
       }
       uiActions.closeModal("isCustomizeModalOpen");
       uiActions.setShowProducts(false);
