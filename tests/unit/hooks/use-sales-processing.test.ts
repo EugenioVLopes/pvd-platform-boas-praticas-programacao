@@ -1,5 +1,6 @@
+﻿import type { SaleItem } from "@/features/products";
+import type { Order } from "@/features/sales";
 import { useSalesProcessing } from "@/features/sales/hooks/use-sales-processing";
-import type { Order, PaymentMethod } from "@/features/sales";
 import {
   createMockSaleItem,
   createMockWeightSaleItem,
@@ -8,9 +9,15 @@ import {
 import { createMockOrder } from "@/tests/fixtures/sales";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
-// Mock dos hooks dependentes
+import * as UseCartHook from "@/features/sales/hooks/use-cart";
+import * as UseOrdersHook from "@/features/sales/hooks/use-orders";
+import * as UseSalesUIHook from "@/features/sales/hooks/use-sales-ui";
+// ---------------------------------------------------------------------------------
+
+// Mock das funçÃµes individuais
 const mockAddItem = jest.fn();
 const mockRemoveItem = jest.fn();
+const mockUpdateItem = jest.fn();
 const mockClearCart = jest.fn();
 const mockGetItemTotal = jest.fn((item) => {
   if (item.product.type === "weight" && item.weight) {
@@ -18,10 +25,24 @@ const mockGetItemTotal = jest.fn((item) => {
   }
   return item.product.price * (item.quantity ?? 1);
 });
+const mockCanAddItem = jest.fn(() => true);
+const mockFindItemIndex = jest.fn(() => -1);
+const mockHasItem = jest.fn(() => false);
+const mockAddMultipleItems = jest.fn(() => [true]);
+const mockRemoveMultipleItems = jest.fn();
+const mockUpdateMultipleItems = jest.fn(() => [true]);
+const mockGetSubtotal = jest.fn(() => 0);
+const mockGetTotalWithTax = jest.fn(() => 0);
+const mockGetItemsByCategory = jest.fn(() => []);
+const mockClearError = jest.fn();
 
 const mockUpdateOrder = jest.fn();
 const mockRemoveOrder = jest.fn();
 const mockAddOrder = jest.fn();
+const mockGetOrder = jest.fn();
+const mockClearOrders = jest.fn();
+const mockClearOrderError = jest.fn();
+
 const mockCompleteSale = jest.fn();
 const mockToast = jest.fn();
 
@@ -36,6 +57,15 @@ const mockSelectOrder = jest.fn();
 const mockSetNewOrderName = jest.fn();
 const mockOpenNewOrderModal = jest.fn();
 const mockOpenActionModal = jest.fn();
+const mockOpenProductDetails = jest.fn();
+const mockOpenCategoryModal = jest.fn();
+const mockCloseAllModals = jest.fn();
+const mockSelectProduct = jest.fn();
+const mockToggleProductsView = jest.fn();
+const mockToggleOrderDetails = jest.fn();
+const mockSetShowOrderDetails = jest.fn();
+const mockUpdateState = jest.fn();
+const mockResetState = jest.fn();
 
 jest.mock("@/features/products/hooks/use-products", () => ({
   useProducts: () => ({
@@ -43,24 +73,9 @@ jest.mock("@/features/products/hooks/use-products", () => ({
   }),
 }));
 
-jest.mock("@/features/sales/hooks/use-cart", () => ({
-  useCart: () => ({
-    items: [],
-    addItem: mockAddItem,
-    removeItem: mockRemoveItem,
-    clearCart: mockClearCart,
-    getItemTotal: mockGetItemTotal,
-  }),
-}));
-
-jest.mock("@/features/sales/hooks/use-orders", () => ({
-  useOrders: () => ({
-    orders: [],
-    updateOrder: mockUpdateOrder,
-    removeOrder: mockRemoveOrder,
-    addOrder: mockAddOrder,
-  }),
-}));
+jest.mock("@/features/sales/hooks/use-cart");
+jest.mock("@/features/sales/hooks/use-orders");
+jest.mock("@/features/sales/hooks/use-sales-ui");
 
 jest.mock("@/features/sales/hooks/use-sales", () => ({
   useSales: () => ({
@@ -70,48 +85,121 @@ jest.mock("@/features/sales/hooks/use-sales", () => ({
   }),
 }));
 
-jest.mock("@/features/sales/hooks/use-sales-ui", () => ({
-  useSalesUI: () => ({
-    state: {
-      currentOrderId: null,
-      selectedCategory: null,
-      selectedProduct: null,
-      showProducts: false,
-      isWeightModalOpen: false,
-      isCustomizeModalOpen: false,
-      isPaymentModalOpen: false,
-      isNewOrderModalOpen: false,
-      isActionModalOpen: false,
-    },
-    actions: {
-      selectCategory: mockSelectCategory,
-      openWeightModal: mockOpenWeightModal,
-      openCustomizeModal: mockOpenCustomizeModal,
-      closeModal: mockCloseModal,
-      setShowProducts: mockSetShowProducts,
-      setPaymentProcessing: mockSetPaymentProcessing,
-      openPaymentModal: mockOpenPaymentModal,
-      selectOrder: mockSelectOrder,
-      setNewOrderName: mockSetNewOrderName,
-      openNewOrderModal: mockOpenNewOrderModal,
-      openActionModal: mockOpenActionModal,
-    },
-  }),
-}));
-
 jest.mock("@/hooks", () => ({
   useToast: () => ({
     toast: mockToast,
   }),
 }));
 
+// Helper functions for mocking
+const createMockUseOrdersReturn = (orders: Order[] = []) => ({
+  orders,
+  loading: false,
+  error: null,
+  orderCount: orders.length,
+  totalValue: 0,
+  addOrder: mockAddOrder,
+  updateOrder: mockUpdateOrder,
+  removeOrder: mockRemoveOrder,
+  getOrder: mockGetOrder,
+  clearOrders: mockClearOrders,
+  clearError: mockClearOrderError,
+});
+
+const createMockUseSalesUIReturn = (
+  overrides: {
+    state?: Record<string, unknown>;
+    root?: Record<string, unknown>;
+  } = {}
+) => ({
+  state: {
+    isWeightModalOpen: false,
+    isPaymentModalOpen: false,
+    isCustomizeModalOpen: false,
+    isNewOrderModalOpen: false,
+    isActionModalOpen: false,
+    isProductDetailsOpen: false,
+    isCategoryOpen: false,
+    currentOrderId: null,
+    selectedCategory: null,
+    selectedProduct: null,
+    showProducts: false,
+    newOrderName: "",
+    currentProduct: null,
+    currentCategory: null,
+    showOrderDetails: false,
+    paymentProcessing: false,
+    ...overrides.state,
+  },
+  actions: {
+    selectCategory: mockSelectCategory,
+    openWeightModal: mockOpenWeightModal,
+    openCustomizeModal: mockOpenCustomizeModal,
+    closeModal: mockCloseModal,
+    setShowProducts: mockSetShowProducts,
+    setPaymentProcessing: mockSetPaymentProcessing,
+    openPaymentModal: mockOpenPaymentModal,
+    selectOrder: mockSelectOrder,
+    setNewOrderName: mockSetNewOrderName,
+    openNewOrderModal: mockOpenNewOrderModal,
+    openActionModal: mockOpenActionModal,
+    openProductDetails: mockOpenProductDetails,
+    openCategoryModal: mockOpenCategoryModal,
+    closeAllModals: mockCloseAllModals,
+    selectProduct: mockSelectProduct,
+    toggleProductsView: mockToggleProductsView,
+    toggleOrderDetails: mockToggleOrderDetails,
+    setShowOrderDetails: mockSetShowOrderDetails,
+    updateState: mockUpdateState,
+    resetState: mockResetState,
+  },
+  hasOpenModal: false,
+  currentModal: null,
+  canShowProducts: true,
+  ...overrides.root,
+});
+
+const createMockUseCartReturn = (items: SaleItem[] = []) => ({
+  items,
+  totalItems: items.length,
+  totalValue: items.reduce((sum, item) => sum + mockGetItemTotal(item), 0),
+  isEmpty: items.length === 0,
+  addItem: mockAddItem,
+  removeItem: mockRemoveItem,
+  updateItem: mockUpdateItem,
+  clearCart: mockClearCart,
+  canAddItem: mockCanAddItem,
+  getItemTotal: mockGetItemTotal,
+  findItemIndex: mockFindItemIndex,
+  hasItem: mockHasItem,
+  addMultipleItems: mockAddMultipleItems,
+  removeMultipleItems: mockRemoveMultipleItems,
+  updateMultipleItems: mockUpdateMultipleItems,
+  getSubtotal: mockGetSubtotal,
+  getTotalWithTax: mockGetTotalWithTax,
+  getItemsByCategory: mockGetItemsByCategory,
+  isValid: true,
+  validationErrors: [],
+  error: null,
+  clearError: mockClearError,
+});
+
 describe("useSalesProcessing", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Setup default mocks for useCart, useOrders and useSalesUI
+    jest.mocked(UseCartHook.useCart).mockReturnValue(createMockUseCartReturn());
+    jest
+      .mocked(UseOrdersHook.useOrders)
+      .mockReturnValue(createMockUseOrdersReturn());
+    jest
+      .mocked(UseSalesUIHook.useSalesUI)
+      .mockReturnValue(createMockUseSalesUIReturn());
   });
 
-  describe("Inicialização", () => {
-    test("deve inicializar com valores padrão", () => {
+  describe("InicializaçÃ£o", () => {
+    test("deve inicializar com valores padrÃ£o", () => {
       // ARRANGE & ACT
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -176,7 +264,7 @@ describe("useSalesProcessing", () => {
   });
 
   describe("handleProductSelect", () => {
-    test("deve adicionar produto simples ao carrinho quando não há comanda ativa", () => {
+    test("deve adicionar produto simples ao carrinho quando nÃ£o hÃ¡ comanda ativa", () => {
       // ARRANGE
       const { result } = renderHook(() => useSalesProcessing());
       const product = mockProducts[0]; // Sorvete de Chocolate (unit)
@@ -195,7 +283,7 @@ describe("useSalesProcessing", () => {
     test("deve abrir modal de peso para produto por peso", () => {
       // ARRANGE
       const { result } = renderHook(() => useSalesProcessing());
-      const product = mockProducts[2]; // Açaí no Peso
+      const product = mockProducts[2]; // AçaÃ­ no Peso
 
       // ACT
       act(() => {
@@ -207,7 +295,7 @@ describe("useSalesProcessing", () => {
       expect(mockAddItem).not.toHaveBeenCalled();
     });
 
-    test("deve abrir modal de customização para produto com opções", () => {
+    test("deve abrir modal de customizaçÃ£o para produto com opçÃµes", () => {
       // ARRANGE
       const { result } = renderHook(() => useSalesProcessing());
       const product = mockProducts[3]; // Monte do Seu Jeito (tem options)
@@ -222,48 +310,19 @@ describe("useSalesProcessing", () => {
       expect(mockAddItem).not.toHaveBeenCalled();
     });
 
-    test("deve adicionar produto à comanda ativa quando há currentOrderId", () => {
+    test("deve adicionar produto Ã  comanda ativa quando hÃ¡ currentOrderId", () => {
       // ARRANGE
       const mockOrder = createMockOrder({ id: "order-1" });
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [mockOrder],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-sales-ui"),
-        "useSalesUI"
-      ).mockReturnValue({
-        state: {
-          currentOrderId: "order-1",
-          selectedCategory: null,
-          selectedProduct: null,
-          showProducts: false,
-          isWeightModalOpen: false,
-          isCustomizeModalOpen: false,
-          isPaymentModalOpen: false,
-          isNewOrderModalOpen: false,
-          isActionModalOpen: false,
-        },
-        actions: {
-          selectCategory: mockSelectCategory,
-          openWeightModal: mockOpenWeightModal,
-          openCustomizeModal: mockOpenCustomizeModal,
-          closeModal: mockCloseModal,
-          setShowProducts: mockSetShowProducts,
-          setPaymentProcessing: mockSetPaymentProcessing,
-          openPaymentModal: mockOpenPaymentModal,
-          selectOrder: mockSelectOrder,
-          setNewOrderName: mockSetNewOrderName,
-          openNewOrderModal: mockOpenNewOrderModal,
-          openActionModal: mockOpenActionModal,
-        },
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([mockOrder]));
+
+      jest.mocked(UseSalesUIHook.useSalesUI).mockReturnValue(
+        createMockUseSalesUIReturn({
+          state: { currentOrderId: "order-1" },
+        })
+      );
 
       const { result } = renderHook(() => useSalesProcessing());
       const product = mockProducts[0];
@@ -275,10 +334,7 @@ describe("useSalesProcessing", () => {
 
       // ASSERT
       expect(mockUpdateOrder).toHaveBeenCalledWith("order-1", {
-        items: [
-          ...mockOrder.items,
-          { product, quantity: 1 },
-        ],
+        items: [...mockOrder.items, { product, quantity: 1 }],
       });
       expect(mockToast).toHaveBeenCalledWith({
         title: "Produto Adicionado",
@@ -291,35 +347,11 @@ describe("useSalesProcessing", () => {
   describe("handleWeightConfirm", () => {
     test("deve adicionar produto por peso ao carrinho", () => {
       // ARRANGE
-      jest.spyOn(
-        require("@/features/sales/hooks/use-sales-ui"),
-        "useSalesUI"
-      ).mockReturnValue({
-        state: {
-          currentOrderId: null,
-          selectedProduct: mockProducts[2], // Açaí no Peso
-          selectedCategory: null,
-          showProducts: false,
-          isWeightModalOpen: false,
-          isCustomizeModalOpen: false,
-          isPaymentModalOpen: false,
-          isNewOrderModalOpen: false,
-          isActionModalOpen: false,
-        },
-        actions: {
-          selectCategory: mockSelectCategory,
-          openWeightModal: mockOpenWeightModal,
-          openCustomizeModal: mockOpenCustomizeModal,
-          closeModal: mockCloseModal,
-          setShowProducts: mockSetShowProducts,
-          setPaymentProcessing: mockSetPaymentProcessing,
-          openPaymentModal: mockOpenPaymentModal,
-          selectOrder: mockSelectOrder,
-          setNewOrderName: mockSetNewOrderName,
-          openNewOrderModal: mockOpenNewOrderModal,
-          openActionModal: mockOpenActionModal,
-        },
-      });
+      jest.mocked(UseSalesUIHook.useSalesUI).mockReturnValue(
+        createMockUseSalesUIReturn({
+          state: { selectedProduct: mockProducts[2] }, // AçaÃ­ no Peso
+        })
+      );
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -337,48 +369,22 @@ describe("useSalesProcessing", () => {
       expect(mockSetShowProducts).toHaveBeenCalledWith(false);
     });
 
-    test("deve adicionar produto por peso à comanda ativa", () => {
+    test("deve adicionar produto por peso Ã  comanda ativa", () => {
       // ARRANGE
       const mockOrder = createMockOrder({ id: "order-1" });
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [mockOrder],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-sales-ui"),
-        "useSalesUI"
-      ).mockReturnValue({
-        state: {
-          currentOrderId: "order-1",
-          selectedProduct: mockProducts[2],
-          selectedCategory: null,
-          showProducts: false,
-          isWeightModalOpen: false,
-          isCustomizeModalOpen: false,
-          isPaymentModalOpen: false,
-          isNewOrderModalOpen: false,
-          isActionModalOpen: false,
-        },
-        actions: {
-          selectCategory: mockSelectCategory,
-          openWeightModal: mockOpenWeightModal,
-          openCustomizeModal: mockOpenCustomizeModal,
-          closeModal: mockCloseModal,
-          setShowProducts: mockSetShowProducts,
-          setPaymentProcessing: mockSetPaymentProcessing,
-          openPaymentModal: mockOpenPaymentModal,
-          selectOrder: mockSelectOrder,
-          setNewOrderName: mockSetNewOrderName,
-          openNewOrderModal: mockOpenNewOrderModal,
-          openActionModal: mockOpenActionModal,
-        },
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([mockOrder]));
+
+      jest.mocked(UseSalesUIHook.useSalesUI).mockReturnValue(
+        createMockUseSalesUIReturn({
+          state: {
+            currentOrderId: "order-1",
+            selectedProduct: mockProducts[2],
+          },
+        })
+      );
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -408,35 +414,13 @@ describe("useSalesProcessing", () => {
   describe("handleCustomizeConfirm", () => {
     test("deve adicionar produto customizado ao carrinho", () => {
       // ARRANGE
-      jest.spyOn(
-        require("@/features/sales/hooks/use-sales-ui"),
-        "useSalesUI"
-      ).mockReturnValue({
-        state: {
-          currentOrderId: null,
-          selectedProduct: mockProducts[3], // Monte do Seu Jeito
-          selectedCategory: null,
-          showProducts: false,
-          isWeightModalOpen: false,
-          isCustomizeModalOpen: false,
-          isPaymentModalOpen: false,
-          isNewOrderModalOpen: false,
-          isActionModalOpen: false,
-        },
-        actions: {
-          selectCategory: mockSelectCategory,
-          openWeightModal: mockOpenWeightModal,
-          openCustomizeModal: mockOpenCustomizeModal,
-          closeModal: mockCloseModal,
-          setShowProducts: mockSetShowProducts,
-          setPaymentProcessing: mockSetPaymentProcessing,
-          openPaymentModal: mockOpenPaymentModal,
-          selectOrder: mockSelectOrder,
-          setNewOrderName: mockSetNewOrderName,
-          openNewOrderModal: mockOpenNewOrderModal,
-          openActionModal: mockOpenActionModal,
-        },
-      });
+      jest.mocked(UseSalesUIHook.useSalesUI).mockReturnValue(
+        createMockUseSalesUIReturn({
+          state: {
+            selectedProduct: mockProducts[3], // Monte do Seu Jeito
+          },
+        })
+      );
 
       const { result } = renderHook(() => useSalesProcessing());
       const selectedOptions = {
@@ -444,7 +428,8 @@ describe("useSalesProcessing", () => {
         cremes: ["Chocolate"],
         acompanhamentos: ["Granola"],
       };
-      const addons = [];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const addons: any[] = [];
 
       // ACT
       act(() => {
@@ -465,16 +450,12 @@ describe("useSalesProcessing", () => {
     test("deve finalizar venda com sucesso", async () => {
       // ARRANGE
       mockCompleteSale.mockResolvedValue(undefined);
-      jest.spyOn(
-        require("@/features/sales/hooks/use-cart"),
-        "useCart"
-      ).mockReturnValue({
-        items: [createMockSaleItem({ quantity: 2 })],
-        addItem: mockAddItem,
-        removeItem: mockRemoveItem,
-        clearCart: mockClearCart,
-        getItemTotal: mockGetItemTotal,
-      });
+
+      jest
+        .mocked(UseCartHook.useCart)
+        .mockReturnValue(
+          createMockUseCartReturn([createMockSaleItem({ quantity: 2 })])
+        );
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -508,45 +489,18 @@ describe("useSalesProcessing", () => {
       });
 
       mockCompleteSale.mockResolvedValue(undefined);
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [mockOrder],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-sales-ui"),
-        "useSalesUI"
-      ).mockReturnValue({
-        state: {
-          currentOrderId: "order-1",
-          selectedProduct: null,
-          selectedCategory: null,
-          showProducts: false,
-          isWeightModalOpen: false,
-          isCustomizeModalOpen: false,
-          isPaymentModalOpen: false,
-          isNewOrderModalOpen: false,
-          isActionModalOpen: false,
-        },
-        actions: {
-          selectCategory: mockSelectCategory,
-          openWeightModal: mockOpenWeightModal,
-          openCustomizeModal: mockOpenCustomizeModal,
-          closeModal: mockCloseModal,
-          setShowProducts: mockSetShowProducts,
-          setPaymentProcessing: mockSetPaymentProcessing,
-          openPaymentModal: mockOpenPaymentModal,
-          selectOrder: mockSelectOrder,
-          setNewOrderName: mockSetNewOrderName,
-          openNewOrderModal: mockOpenNewOrderModal,
-          openActionModal: mockOpenActionModal,
-        },
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([mockOrder]));
+
+      jest.mocked(UseSalesUIHook.useSalesUI).mockReturnValue(
+        createMockUseSalesUIReturn({
+          state: {
+            currentOrderId: "order-1",
+          },
+        })
+      );
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -596,16 +550,11 @@ describe("useSalesProcessing", () => {
   describe("createNewOrder", () => {
     test("deve criar nova comanda", () => {
       // ARRANGE
-      jest.spyOn(
-        require("@/features/sales/hooks/use-cart"),
-        "useCart"
-      ).mockReturnValue({
-        items: [createMockSaleItem({ quantity: 2 })],
-        addItem: mockAddItem,
-        removeItem: mockRemoveItem,
-        clearCart: mockClearCart,
-        getItemTotal: mockGetItemTotal,
-      });
+      jest
+        .mocked(UseCartHook.useCart)
+        .mockReturnValue(
+          createMockUseCartReturn([createMockSaleItem({ quantity: 2 })])
+        );
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -627,7 +576,7 @@ describe("useSalesProcessing", () => {
   });
 
   describe("handleActionSelection", () => {
-    test("deve criar nova comanda quando action é 'new_order'", () => {
+    test("deve criar nova comanda quando action Ã© 'new_order'", () => {
       // ARRANGE
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -645,33 +594,22 @@ describe("useSalesProcessing", () => {
       expect(mockCloseModal).toHaveBeenCalledWith("isActionModalOpen");
     });
 
-    test("deve adicionar produtos à comanda existente", () => {
+    test("deve adicionar produtos Ã  comanda existente", () => {
       // ARRANGE
       const mockOrder = createMockOrder({
         id: "order-1",
         customerName: "João Silva",
       });
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [mockOrder],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([mockOrder]));
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-cart"),
-        "useCart"
-      ).mockReturnValue({
-        items: [createMockSaleItem({ quantity: 1 })],
-        addItem: mockAddItem,
-        removeItem: mockRemoveItem,
-        clearCart: mockClearCart,
-        getItemTotal: mockGetItemTotal,
-      });
+      jest
+        .spyOn(UseCartHook, "useCart")
+        .mockReturnValue(
+          createMockUseCartReturn([createMockSaleItem({ quantity: 1 })])
+        );
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -692,23 +630,20 @@ describe("useSalesProcessing", () => {
       expect(mockSelectOrder).toHaveBeenCalledWith("order-1");
     });
 
-    test("deve mostrar erro quando comanda não é encontrada", () => {
+    test("deve mostrar erro quando comanda nÃ£o Ã© encontrada", () => {
       // ARRANGE
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([]));
 
       const { result } = renderHook(() => useSalesProcessing());
 
       // ACT
       act(() => {
-        result.current.handleActionSelection("add_to_order", "order-inexistente");
+        result.current.handleActionSelection(
+          "add_to_order",
+          "order-inexistente"
+        );
       });
 
       // ASSERT
@@ -719,7 +654,7 @@ describe("useSalesProcessing", () => {
       });
     });
 
-    test("deve abrir modal de pagamento quando action é 'finalize_sale'", () => {
+    test("deve abrir modal de pagamento quando action Ã© 'finalize_sale'", () => {
       // ARRANGE
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -745,15 +680,9 @@ describe("useSalesProcessing", () => {
         ],
       });
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [mockOrder],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([mockOrder]));
 
       const { result } = renderHook(() => useSalesProcessing());
       const updatedItem = createMockSaleItem({ quantity: 3 });
@@ -781,15 +710,9 @@ describe("useSalesProcessing", () => {
         ],
       });
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [mockOrder],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([mockOrder]));
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -828,48 +751,19 @@ describe("useSalesProcessing", () => {
   });
 
   describe("currentOrder", () => {
-    test("deve retornar comanda atual quando há currentOrderId", () => {
+    test("deve retornar comanda atual quando hÃ¡ currentOrderId", () => {
       // ARRANGE
       const mockOrder = createMockOrder({ id: "order-1" });
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [mockOrder],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-sales-ui"),
-        "useSalesUI"
-      ).mockReturnValue({
-        state: {
-          currentOrderId: "order-1",
-          selectedProduct: null,
-          selectedCategory: null,
-          showProducts: false,
-          isWeightModalOpen: false,
-          isCustomizeModalOpen: false,
-          isPaymentModalOpen: false,
-          isNewOrderModalOpen: false,
-          isActionModalOpen: false,
-        },
-        actions: {
-          selectCategory: mockSelectCategory,
-          openWeightModal: mockOpenWeightModal,
-          openCustomizeModal: mockOpenCustomizeModal,
-          closeModal: mockCloseModal,
-          setShowProducts: mockSetShowProducts,
-          setPaymentProcessing: mockSetPaymentProcessing,
-          openPaymentModal: mockOpenPaymentModal,
-          selectOrder: mockSelectOrder,
-          setNewOrderName: mockSetNewOrderName,
-          openNewOrderModal: mockOpenNewOrderModal,
-          openActionModal: mockOpenActionModal,
-        },
-      });
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([mockOrder]));
+
+      jest.mocked(UseSalesUIHook.useSalesUI).mockReturnValue(
+        createMockUseSalesUIReturn({
+          state: { currentOrderId: "order-1" },
+        })
+      );
 
       const { result } = renderHook(() => useSalesProcessing());
 
@@ -877,48 +771,18 @@ describe("useSalesProcessing", () => {
       expect(result.current.currentOrder).toEqual(mockOrder);
     });
 
-    test("deve retornar null quando não há currentOrderId", () => {
+    test("deve retornar null quando nÃ£o hÃ¡ currentOrderId", () => {
       // ARRANGE
-      // Resetar mocks para usar valores padrão
-      jest.spyOn(
-        require("@/features/sales/hooks/use-orders"),
-        "useOrders"
-      ).mockReturnValue({
-        orders: [],
-        updateOrder: mockUpdateOrder,
-        removeOrder: mockRemoveOrder,
-        addOrder: mockAddOrder,
-      });
+      // Resetar mocks para usar valores padrÃ£o
+      jest
+        .mocked(UseOrdersHook.useOrders)
+        .mockReturnValue(createMockUseOrdersReturn([]));
 
-      jest.spyOn(
-        require("@/features/sales/hooks/use-sales-ui"),
-        "useSalesUI"
-      ).mockReturnValue({
-        state: {
-          currentOrderId: null,
-          selectedProduct: null,
-          selectedCategory: null,
-          showProducts: false,
-          isWeightModalOpen: false,
-          isCustomizeModalOpen: false,
-          isPaymentModalOpen: false,
-          isNewOrderModalOpen: false,
-          isActionModalOpen: false,
-        },
-        actions: {
-          selectCategory: mockSelectCategory,
-          openWeightModal: mockOpenWeightModal,
-          openCustomizeModal: mockOpenCustomizeModal,
-          closeModal: mockCloseModal,
-          setShowProducts: mockSetShowProducts,
-          setPaymentProcessing: mockSetPaymentProcessing,
-          openPaymentModal: mockOpenPaymentModal,
-          selectOrder: mockSelectOrder,
-          setNewOrderName: mockSetNewOrderName,
-          openNewOrderModal: mockOpenNewOrderModal,
-          openActionModal: mockOpenActionModal,
-        },
-      });
+      jest.mocked(UseSalesUIHook.useSalesUI).mockReturnValue(
+        createMockUseSalesUIReturn({
+          state: { currentOrderId: null },
+        })
+      );
 
       // ACT
       const { result } = renderHook(() => useSalesProcessing());
@@ -928,4 +792,3 @@ describe("useSalesProcessing", () => {
     });
   });
 });
-
