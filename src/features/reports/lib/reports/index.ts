@@ -1,5 +1,12 @@
 import type { Order, SalesReport } from "@/features/sales";
 
+type DateRange = {
+  from: Date;
+  to: Date;
+};
+
+type ReportType = "daily" | "weekly" | "monthly";
+
 export function filterOrdersByPeriod(
   orders: Order[],
   startDate: Date,
@@ -135,40 +142,48 @@ export function calculateSalesReport(
   };
 }
 
-export function getDateRangeForReportType(
-  type: "daily" | "weekly" | "monthly"
-): {
-  from: Date;
-  to: Date;
-} {
+export function getDateRangeForReportType(type: ReportType): DateRange {
   const now = new Date();
-  const startOfToday = new Date(now);
-  startOfToday.setHours(0, 0, 0, 0);
-  const endOfToday = new Date(now);
-  endOfToday.setHours(23, 59, 59, 999);
-
-  let from: Date, to: Date;
+  const startOfToday = createDateAtStartOfDay(now);
+  const endOfToday = createDateAtEndOfDay(now);
 
   switch (type) {
     case "daily":
-    case "monthly":
-    default:
-      from =
-        type === "monthly"
-          ? new Date(startOfToday.getFullYear(), startOfToday.getMonth(), 1)
-          : startOfToday;
-      if (type === "monthly") {
-        from.setHours(0, 0, 0, 0);
-      }
-      to = endOfToday;
-      break;
-    case "weekly":
-      from = getStartOfWeek(startOfToday);
-      to = endOfToday;
-      break;
-  }
+      return { from: startOfToday, to: endOfToday };
 
-  return { from, to };
+    case "weekly":
+      return {
+        from: getStartOfWeek(startOfToday),
+        to: endOfToday,
+      };
+
+    case "monthly":
+      return {
+        from: getStartOfMonth(startOfToday),
+        to: endOfToday,
+      };
+
+    default:
+      return { from: startOfToday, to: endOfToday };
+  }
+}
+
+function createDateAtStartOfDay(date: Date): Date {
+  const result = new Date(date);
+  result.setHours(0, 0, 0, 0);
+  return result;
+}
+
+function createDateAtEndOfDay(date: Date): Date {
+  const result = new Date(date);
+  result.setHours(23, 59, 59, 999);
+  return result;
+}
+
+function getStartOfMonth(date: Date): Date {
+  const result = new Date(date.getFullYear(), date.getMonth(), 1);
+  result.setHours(0, 0, 0, 0);
+  return result;
 }
 
 function getStartOfWeek(date: Date): Date {
